@@ -27,6 +27,7 @@ public class Statement implements Opcodes {
     public static <T> Statement createVariable(Class<T> type, String varName, T defaultValue) {
         return new Statement((method, visitor) -> {
             int storeIndex = method.generateStoreIndex();
+            // TODO const
             visitor.visitLdcInsn(defaultValue != null ? defaultValue : ACONST_NULL);
             visitor.visitVarInsn(ASTORE, storeIndex);
             method.setVarStoreIndex(varName, storeIndex);

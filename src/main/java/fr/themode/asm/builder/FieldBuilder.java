@@ -25,7 +25,7 @@ public class FieldBuilder<T> extends Reachable {
         return createField(ClassConverter.getName(type), fieldName, defaultValue);
     }
 
-    public static <T> FieldBuilder createField(String type, String fieldName) {
+    public static FieldBuilder createField(String type, String fieldName) {
         return createField(type, fieldName, null);
     }
 

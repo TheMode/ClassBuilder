@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MethodBuilder<T> extends Reachable implements Opcodes {
+public class MethodBuilder extends Reachable implements Opcodes {
 
     private String methodName;
     private String type;
@@ -42,11 +42,11 @@ public class MethodBuilder<T> extends Reachable implements Opcodes {
         return new MethodBuilder(methodName, type, parameters);
     }
 
-    public static <T> MethodBuilder createMethod(String methodName, Class<T> type, Class... parameters) {
-        return new MethodBuilder<T>(methodName, ClassConverter.getName(type), ClassConverter.getNames(parameters));
+    public static MethodBuilder createMethod(String methodName, Class type, Class... parameters) {
+        return new MethodBuilder(methodName, ClassConverter.getName(type), ClassConverter.getNames(parameters));
     }
 
-    public void loadToWriter(ClassWriter classWriter, MethodVisitor visitor) {
+    protected void loadToWriter(ClassWriter classWriter, MethodVisitor visitor) {
         int modifier = getModifiersValue();
         String descriptor = getMethodDescriptor();
         // null = signature(generic), exceptions
@@ -103,7 +103,6 @@ public class MethodBuilder<T> extends Reachable implements Opcodes {
         storeIndex = parameters.length;
     }
 
-    // Statement utils
     protected int generateStoreIndex() {
         return ++storeIndex;
     }

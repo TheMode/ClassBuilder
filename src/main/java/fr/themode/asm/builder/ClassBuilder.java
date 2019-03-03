@@ -61,6 +61,7 @@ public class ClassBuilder extends Reachable implements Opcodes {
         this.classWriter.visitEnd();
         this.bytes = classWriter.toByteArray();
 
+        // Debug
         ClassPrint.printASM(getBytes());
 
         DynamicClassLoader classLoader = new DynamicClassLoader();
@@ -69,8 +70,6 @@ public class ClassBuilder extends Reachable implements Opcodes {
     }
 
     private void setup() {
-        this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-
         int modifierValue = getModifiersValue();
         classWriter.visit(version, modifierValue, getInternalName(), null, ClassConverter.getName(superClass), getInterfacesInternalName());
         // TODO visitSource ?

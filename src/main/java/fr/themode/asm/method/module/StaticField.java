@@ -11,13 +11,17 @@ public class StaticField extends FinderModule {
 
     public StaticField(LinkedList<MethodInstruction> instructions, String lastType, String clazz, String fieldName, String type) {
         super(instructions, lastType);
-        setLastType(ClassConverter.getName(type));
-        instructions.add(new MethodInstruction().getStaticField(ClassConverter.getName(clazz), fieldName, DescriptorUtils.getDescriptor(type)));
+        addInstruction(clazz, fieldName, DescriptorUtils.getDescriptor(type));
+        setLastType(type);
     }
 
     public StaticField(LinkedList<MethodInstruction> instructions, String lastType, Class clazz, String fieldName, Class type) {
         super(instructions, lastType);
-        setLastType(ClassConverter.getName(type));
-        instructions.add(new MethodInstruction().getStaticField(clazz, fieldName, DescriptorUtils.getDescriptor(type)));
+        addInstruction(ClassConverter.getName(clazz), fieldName, DescriptorUtils.getDescriptor(type));
+        setLastType(type);
+    }
+
+    private void addInstruction(String clazz, String fieldName, String descriptor) {
+        getInstructions().add(new MethodInstruction().getStaticField(clazz, fieldName, descriptor));
     }
 }

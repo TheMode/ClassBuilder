@@ -14,10 +14,9 @@ public class MethodInstruction implements Opcodes {
 
     private int opcode;
 
-    // Static information
+    // Information
     private String clazz;
     private String descriptor;
-
     private String identifier;
 
     public void load(MethodVisitor visitor) {
