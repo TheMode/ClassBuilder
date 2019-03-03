@@ -35,7 +35,7 @@ classBuilder.addMethod(method);
 
 ### Statements ###
 Statements are the core of the library, without statement your code won't do anything.
-It includes field/variable manipulation
+It includes field/variable manipulation and method execution
 
 ### Flow control ###
 In progress
