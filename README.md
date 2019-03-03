@@ -27,3 +27,10 @@ method.addStatement(Statement.createVariable(String.class, "varName", "default v
 ...
 classBuilder.addMethod(method);
 ```
+
+### Statements ###
+Statements are the core of the library, without statement your code won't do anything.
+It includes field/variable manipulation
+
+### Flow control ###
+In progress
