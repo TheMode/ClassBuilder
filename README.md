@@ -29,7 +29,7 @@ classBuilder.addField(field);
 // void is the return type, String and int are arguments
 MethodBuilder method = MethodBuilder.createMethod("main", void.class, String.class, int.class);
 method.setModifiers(Modifier.PUBLIC, Modifier.STATIC);
-method.addStatement(Statement.createVariable(String.class, "varName", "default value"));
+method.addStatement(Statement.createVariable(String.class, "varName", Parameter.constant("default value")));
 ...
 classBuilder.addMethod(method);
 ```
