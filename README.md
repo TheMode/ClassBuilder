@@ -2,6 +2,12 @@
 
 # Overview
 Give you the ability to create java code... using java, the main goal is to generate code at run time, it can be used to create a scripting language.
+### TODO list ###
+- Flow control
+- Inheritance
+- More statements
+- More Utils class
+
 # Usage
 ### Generating the class ###
 ```java
