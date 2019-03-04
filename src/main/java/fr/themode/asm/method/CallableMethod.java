@@ -24,6 +24,7 @@ public class CallableMethod {
         int length = parameters.length;
         if (count != length)
             throw new IllegalArgumentException("Method should take " + count + " args instead of " + length);
+
         for (MethodInstruction instruction : instructions) {
             instruction.load(visitor);
         }
@@ -35,4 +36,7 @@ public class CallableMethod {
         invokable.load(visitor);
     }
 
+    public int getArgumentCount() {
+        return count;
+    }
 }

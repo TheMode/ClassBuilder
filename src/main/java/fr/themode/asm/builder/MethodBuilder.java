@@ -1,5 +1,7 @@
 package fr.themode.asm.builder;
 
+import fr.themode.asm.method.CallableMethod;
+import fr.themode.asm.method.MethodFinder;
 import fr.themode.asm.utils.ClassConverter;
 import fr.themode.asm.utils.DescriptorUtils;
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -69,6 +71,18 @@ public class MethodBuilder extends Reachable implements Opcodes {
         }
     }
 
+    public CallableMethod asCallable(String className) {
+        if (isStatic()) {
+            return MethodFinder.getStaticMethod(className, methodName, type, parameters).asCallable();
+        } else {
+            return MethodFinder.getLocalMethod(className, methodName, type, parameters).asCallable();
+        }
+    }
+
+    public CallableMethod asCallable(ClassBuilder classBuilder) {
+        return asCallable(classBuilder.getInternalName());
+    }
+
     public void addStatement(Statement statement) {
         this.statements.add(statement);
     }
@@ -90,7 +104,7 @@ public class MethodBuilder extends Reachable implements Opcodes {
     }
 
     public boolean isStatic() {
-        return getModifiersValue() == ACC_STATIC;
+        return (getModifiersValue() & ACC_STATIC) == ACC_STATIC;
     }
 
     private void setupDescriptor() {

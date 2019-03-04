@@ -10,8 +10,21 @@ import java.io.PrintWriter;
 public class ASMifierDemo {
 
     public static void main(String[] args){
+        printTest();
+    }
+
+    private static void printSimple() {
         try {
             new ClassReader(SimpleClass.class.getResourceAsStream("SimpleClass.class"))
+                    .accept(new TraceClassVisitor(null, new ASMifier(), new PrintWriter(System.out)), 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void printTest() {
+        try {
+            new ClassReader(FlowControlTest.class.getResourceAsStream("FlowControlTest.class"))
                     .accept(new TraceClassVisitor(null, new ASMifier(), new PrintWriter(System.out)), 0);
         } catch (IOException e) {
             e.printStackTrace();

@@ -24,18 +24,25 @@ public class Statement implements Opcodes {
         this.line = line;
     }
 
-    public static <T> Statement createVariable(Class<T> type, String varName, T defaultValue) {
+    public static <T> Statement createVariable(Class<T> type, String varName, Parameter defaultValue) {
         return new Statement((method, visitor) -> {
             int storeIndex = method.generateStoreIndex();
-            // TODO const
-            visitor.visitLdcInsn(defaultValue != null ? defaultValue : ACONST_NULL);
+            defaultValue.push(method, visitor);
             visitor.visitVarInsn(ASTORE, storeIndex);
             method.setVarStoreIndex(varName, storeIndex);
         });
     }
 
     public static <T> Statement createVariable(Class<T> type, String varName) {
-        return createVariable(type, varName, null);
+        return createVariable(type, varName, Parameter.constant(null));
+    }
+
+    public static <T> Statement setVariable(String varName, Parameter parameter) {
+        return new Statement((method, visitor) -> {
+            int index = method.getVarStoreIndex(varName);
+            parameter.push(method, visitor);
+            visitor.visitVarInsn(ASTORE, index);
+        });
     }
 
     public static <T> Statement callMethod(CallableMethod callableMethod, Parameter... parameters) {

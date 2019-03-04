@@ -1,5 +1,6 @@
 package fr.themode.asm.builder;
 
+import fr.themode.asm.method.CallableMethod;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 
@@ -8,6 +9,10 @@ public class Parameter implements Opcodes {
     private ParameterType type;
     private String name;
     private Object value;
+
+    // Method
+    private CallableMethod method;
+    private Parameter[] parameters;
 
     private Parameter(ParameterType type, String name, Object value) {
         this.type = type;
@@ -35,6 +40,13 @@ public class Parameter implements Opcodes {
         return new Parameter(ParameterType.CONSTANT, null, constant);
     }
 
+    public static Parameter method(CallableMethod method, Parameter... parameters) {
+        Parameter parameter = new Parameter(ParameterType.METHOD, null, null);
+        parameter.method = method;
+        parameter.parameters = parameters;
+        return parameter;
+    }
+
     public void push(MethodBuilder method, MethodVisitor visitor) {
         switch (type) {
             case LOCAL:
@@ -51,14 +63,17 @@ public class Parameter implements Opcodes {
                 visitor.visitVarInsn(ALOAD, index);
                 break;
             case ARGUMENT:
-                visitor.visitVarInsn(ALOAD, (int) value + (method.isStatic() ? -1 : 0));
+                // TODO static offset ?
+                visitor.visitVarInsn(ALOAD, (int) value + (method.isStatic() ? 0 : 1));
+                break;
+            case METHOD:
+                this.method.load(method, visitor, parameters);
                 break;
             case CONSTANT:
-                // TODO CONST_1/2/3 etc...
+                // TODO CONST_1/2/3 null etc...
                 visitor.visitLdcInsn(value);
                 break;
         }
-        // TODO parameter push
     }
 
     public ParameterType getType() {
@@ -74,7 +89,7 @@ public class Parameter implements Opcodes {
     }
 
     public enum ParameterType {
-        LOCAL, FIELD, VARIABLE, ARGUMENT, CONSTANT;
+        LOCAL, FIELD, VARIABLE, ARGUMENT, METHOD, CONSTANT
     }
 
 }

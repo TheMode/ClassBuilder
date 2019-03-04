@@ -39,7 +39,9 @@ public class SimpleClass {
     }
 
     public void testLocal(String a1, int a2){
-        System.out.println(a1);
+        String test = "aa";
+        String test2 = test;
+        test = test2;
     }
 
 }
