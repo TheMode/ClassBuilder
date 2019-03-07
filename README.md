@@ -6,6 +6,8 @@ Give you the ability to create java code... using java, the main goal is to gene
 - Flow control
 - Inheritance
 - Interface
+- Constructor (as parameter and statement)
+- Parameter operator
 - More statements
 - More Utils class
 
