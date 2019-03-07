@@ -7,8 +7,10 @@ public class DescriptorUtils {
     public static String getDescriptor(Class type, Class... parameters) {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append('(');
-        for (int i = 0; i < parameters.length; i++)
-            stringBuffer.append(getDescriptor(parameters[i]));
+        if (parameters != null) {
+            for (int i = 0; i < parameters.length; i++)
+                stringBuffer.append(getDescriptor(parameters[i]));
+        }
         stringBuffer.append(')');
         stringBuffer.append(getDescriptor(type));
         return stringBuffer.toString();
@@ -17,8 +19,10 @@ public class DescriptorUtils {
     public static String getDescriptor(String type, String... parameters) {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append('(');
-        for (int i = 0; i < parameters.length; i++)
-            stringBuffer.append(getDescriptor(parameters[i]));
+        if (parameters != null) {
+            for (int i = 0; i < parameters.length; i++)
+                stringBuffer.append(getDescriptor(parameters[i]));
+        }
         stringBuffer.append(')');
         stringBuffer.append(getDescriptor(type));
         return stringBuffer.toString();

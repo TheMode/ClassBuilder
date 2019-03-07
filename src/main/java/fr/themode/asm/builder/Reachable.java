@@ -1,8 +1,9 @@
 package fr.themode.asm.builder;
 
 import fr.themode.asm.enums.Modifier;
+import jdk.internal.org.objectweb.asm.Opcodes;
 
-public class Reachable {
+public class Reachable implements Opcodes {
 
     private Modifier[] modifiers;
 
@@ -22,4 +23,9 @@ public class Reachable {
             value += modifier.getValue();
         return value;
     }
+
+    public boolean isStatic() {
+        return (getModifiersValue() & ACC_STATIC) == ACC_STATIC;
+    }
+
 }

@@ -53,7 +53,7 @@ public class FieldBuilder<T> extends Reachable {
         return defaultValue;
     }
 
-    private String getDescriptor() {
+    protected String getDescriptor() {
         return DescriptorUtils.getDescriptor(type);
     }
 }

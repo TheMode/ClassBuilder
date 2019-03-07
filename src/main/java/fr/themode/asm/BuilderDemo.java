@@ -24,9 +24,16 @@ public class BuilderDemo {
         field.setModifiers(Modifier.PUBLIC);
         classBuilder.addField(field);
 
+        ConstructorBuilder constructor = ConstructorBuilder.createConstructor();
+        constructor.setModifiers(Modifier.PUBLIC);
+
+        classBuilder.addConstructor(constructor);
+
         MethodBuilder method = createMethod("main", void.class, String.class, int.class);
-        method.setModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        method.setModifiers(Modifier.PUBLIC);
         method.addStatement(Statement.createVariable(String.class, "stringTest", Parameter.constant("a")));
+
+        method.addStatement(Statement.setField("fieldName", Parameter.constant("im a const")));
 
         CallableMethod print = MethodFinder.getStaticField(System.class, "out", PrintStream.class).getMethod("println", void.class, String.class).asCallable();
         method.addStatement(Statement.callMethod(print, Parameter.argument(0)));
@@ -42,14 +49,18 @@ public class BuilderDemo {
         Class result = classBuilder.load();
 
         try {
+            Object obj = result.newInstance();
+
             Method m = result.getMethod("main", String.class, int.class);
             m.setAccessible(true);
-            m.invoke(null, "stringArg", 554);
+            m.invoke(obj, "stringArg", 554);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
             e.printStackTrace();
         }
     }

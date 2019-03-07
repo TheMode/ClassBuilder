@@ -1,5 +1,6 @@
 package fr.themode.asm.method;
 
+import fr.themode.asm.builder.ClassBuilder;
 import fr.themode.asm.builder.MethodBuilder;
 import fr.themode.asm.builder.Parameter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -20,7 +21,7 @@ public class CallableMethod {
         this.count = argsCount;
     }
 
-    public void load(MethodBuilder method, MethodVisitor visitor, Parameter... parameters) {
+    public void load(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, Parameter... parameters) {
         int length = parameters.length;
         if (count != length)
             throw new IllegalArgumentException("Method should take " + count + " args instead of " + length);
@@ -30,7 +31,7 @@ public class CallableMethod {
         }
 
         for (Parameter parameter : parameters) {
-            parameter.push(method, visitor);
+            parameter.push(classBuilder, method, visitor);
         }
 
         invokable.load(visitor);

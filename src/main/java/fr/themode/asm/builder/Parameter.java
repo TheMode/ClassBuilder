@@ -36,6 +36,7 @@ public class Parameter implements Opcodes {
         return new Parameter(ParameterType.ARGUMENT, null, index);
     }
 
+    // TODO only string and primitives
     public static Parameter constant(Object constant) {
         return new Parameter(ParameterType.CONSTANT, null, constant);
     }
@@ -47,16 +48,23 @@ public class Parameter implements Opcodes {
         return parameter;
     }
 
-    public void push(MethodBuilder method, MethodVisitor visitor) {
+    // TODO new instance (constructor)
+
+    // TODO operator (for primitives and string aside with StringBuilder)
+
+    public void push(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
         switch (type) {
             case LOCAL:
                 visitor.visitVarInsn(ALOAD, 0);
                 break;
             case FIELD:
+                boolean isStatic = classBuilder.isFieldStatic(name);
+                String type = classBuilder.findFieldDescriptor(name);
                 // TODO fix load (if both parameters need it, load before)
-                visitor.visitVarInsn(ALOAD, 0);
-                // TODO get descriptor and internal class name
-                visitor.visitFieldInsn(GETFIELD, "fr/themode/asm/SimpleClass", name, "F");
+                if (!isStatic)
+                    visitor.visitVarInsn(ALOAD, 0);
+
+                visitor.visitFieldInsn(isStatic ? GETSTATIC : GETFIELD, classBuilder.getInternalName(), name, type);
                 break;
             case VARIABLE:
                 int index = method.getVarStoreIndex(name);
@@ -67,11 +75,11 @@ public class Parameter implements Opcodes {
                 visitor.visitVarInsn(ALOAD, (int) value + (method.isStatic() ? 0 : 1));
                 break;
             case METHOD:
-                this.method.load(method, visitor, parameters);
+                this.method.load(classBuilder, method, visitor, parameters);
                 break;
             case CONSTANT:
                 // TODO CONST_1/2/3 null etc...
-                visitor.visitLdcInsn(value);
+                visitor.visitLdcInsn(value == null ? ACONST_NULL : value);
                 break;
         }
     }

@@ -6,14 +6,13 @@ import fr.themode.asm.utils.ClassConverter;
 import fr.themode.asm.utils.DescriptorUtils;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import jdk.internal.org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MethodBuilder extends Reachable implements Opcodes {
+public class MethodBuilder extends Reachable {
 
     private String methodName;
     private String type;
@@ -27,10 +26,10 @@ public class MethodBuilder extends Reachable implements Opcodes {
 
     private List<Statement> statements;
 
-    private MethodBuilder(String methodName, String type, String... parameters) {
+    protected MethodBuilder(String methodName, String type, String... parameters) {
         this.methodName = methodName;
-        this.type = type;
-        this.parameters = parameters;
+        this.type = ClassConverter.getName(type);
+        this.parameters = ClassConverter.getNames(parameters);
 
         this.varIndexes = new HashMap<>();
         this.varTypes = new HashMap<>();
@@ -45,29 +44,32 @@ public class MethodBuilder extends Reachable implements Opcodes {
     }
 
     public static MethodBuilder createMethod(String methodName, Class type, Class... parameters) {
-        return new MethodBuilder(methodName, ClassConverter.getName(type), ClassConverter.getNames(parameters));
+        return new MethodBuilder(methodName, type.getName(), ClassConverter.getNames(parameters));
     }
 
-    protected void loadToWriter(ClassWriter classWriter, MethodVisitor visitor) {
+    protected void loadToWriter(ClassBuilder classBuilder) {
+        ClassWriter classWriter = classBuilder.getClassWriter();
+        MethodVisitor methodVisitor;
+
         int modifier = getModifiersValue();
         String descriptor = getMethodDescriptor();
         // null = signature(generic), exceptions
-        visitor = classWriter.visitMethod(modifier, methodName, descriptor, null, null);
-        visitor.visitCode();
+        methodVisitor = classWriter.visitMethod(modifier, methodName, descriptor, null, null);
+        methodVisitor.visitCode();
 
-        setupStatements(visitor);
+        setupStatements(classBuilder, methodVisitor);
 
         // TODO return implementation
-        visitor.visitInsn(RETURN);
+        methodVisitor.visitInsn(RETURN);
 
-        visitor.visitMaxs(0, 0);
-        visitor.visitEnd();
+        methodVisitor.visitMaxs(0, 0);
+        methodVisitor.visitEnd();
     }
 
-    private void setupStatements(MethodVisitor visitor) {
+    protected void setupStatements(ClassBuilder classBuilder, MethodVisitor visitor) {
         // TODO flow control
         for (Statement statement : statements) {
-            statement.append(this, visitor);
+            statement.append(classBuilder, this, visitor);
         }
     }
 
@@ -103,10 +105,6 @@ public class MethodBuilder extends Reachable implements Opcodes {
         return methodDescriptor;
     }
 
-    public boolean isStatic() {
-        return (getModifiersValue() & ACC_STATIC) == ACC_STATIC;
-    }
-
     private void setupDescriptor() {
         this.methodDescriptor = DescriptorUtils.getDescriptor(type, parameters);
     }
@@ -114,7 +112,7 @@ public class MethodBuilder extends Reachable implements Opcodes {
     private void setupIndexes() {
         // 0 = this
         // 1,2... = parameters
-        storeIndex = parameters.length;
+        storeIndex = parameters == null ? 0 : parameters.length;
     }
 
     protected int generateStoreIndex() {
