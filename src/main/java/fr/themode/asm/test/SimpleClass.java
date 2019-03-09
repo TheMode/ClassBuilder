@@ -1,4 +1,4 @@
-package fr.themode.asm;
+package fr.themode.asm.test;
 
 public class SimpleClass {
 

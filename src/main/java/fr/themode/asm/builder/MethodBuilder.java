@@ -7,10 +7,7 @@ import fr.themode.asm.utils.DescriptorUtils;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MethodBuilder extends Reachable {
 
@@ -87,6 +84,10 @@ public class MethodBuilder extends Reachable {
 
     public void addStatement(Statement statement) {
         this.statements.add(statement);
+    }
+
+    public void addStatements(Statement... statements) {
+        this.statements.addAll(Arrays.asList(statements));
     }
 
     public String getMethodName() {

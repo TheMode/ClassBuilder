@@ -1,6 +1,7 @@
 package fr.themode.asm.builder;
 
 import fr.themode.asm.method.CallableMethod;
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 
@@ -12,6 +13,10 @@ public class Statement implements Opcodes {
 
     public Statement(StatementCallback callback) {
         this.callback = callback;
+    }
+
+    public static Statement[] multi(Statement... statements) {
+        return statements;
     }
 
     public static <T> Statement createVariable(Class<T> type, String varName, Parameter defaultValue) {
@@ -43,11 +48,11 @@ public class Statement implements Opcodes {
     public static <T> Statement setField(String fieldName, Parameter parameter) {
         return new Statement((classBuilder, method, visitor) -> {
             boolean isStatic = classBuilder.isFieldStatic(fieldName);
-            String type = classBuilder.findFieldDescriptor(fieldName);
+            String type = classBuilder.getFieldDescriptor(fieldName);
             if (!isStatic)
                 visitor.visitVarInsn(ALOAD, 0);
             parameter.push(classBuilder, method, visitor);
-            visitor.visitFieldInsn(isStatic ? GETSTATIC : PUTFIELD, classBuilder.getInternalName(), fieldName, type);
+            visitor.visitFieldInsn(isStatic ? PUTSTATIC : PUTFIELD, classBuilder.getInternalName(), fieldName, type);
         });
     }
 
@@ -58,7 +63,9 @@ public class Statement implements Opcodes {
     }
 
     public void append(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
-        // TODO line support
+        Label label = new Label();
+        visitor.visitLabel(label);
+        visitor.visitLineNumber(line, label);
         this.callback.append(classBuilder, method, visitor);
     }
 

@@ -1,5 +1,6 @@
 package fr.themode.asm.builder;
 
+import fr.themode.asm.enums.Modifier;
 import fr.themode.asm.loader.DynamicClassLoader;
 import fr.themode.asm.utils.ClassConverter;
 import fr.themode.asm.utils.ClassPrint;
@@ -11,6 +12,7 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ClassBuilder extends Reachable {
 
@@ -23,14 +25,16 @@ public class ClassBuilder extends Reachable {
 
     private int version;
     private String className;
-    private Class superClass;
+    private String superClass;
     private Class[] interfaces;
 
     private List<FieldBuilder> fields;
     private List<ConstructorBuilder> constructors;
     private List<MethodBuilder> methods;
 
-    private ClassBuilder(int version, String className, Class superClass) {
+    private Statement[] staticInit;
+
+    private ClassBuilder(int version, String className, String superClass) {
         this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         this.version = version;
         this.className = className;
@@ -42,7 +46,7 @@ public class ClassBuilder extends Reachable {
     }
 
     public static ClassBuilder createClass(int version, String className) {
-        return new ClassBuilder(version, className, Object.class);
+        return new ClassBuilder(version, className, ClassConverter.getName(Object.class));
     }
 
     public void addField(FieldBuilder field) {
@@ -57,16 +61,24 @@ public class ClassBuilder extends Reachable {
         this.methods.add(method);
     }
 
-    public void setSuperClass(Class superClass) {
-        this.superClass = superClass;
+    public void setSuperClass(String superClass) {
+        this.superClass = ClassConverter.getName(superClass);
     }
+
+    public void setSuperClass(Class superClass) {
+        setSuperClass(ClassConverter.getName(superClass));
+    }
+
+    public void setStaticInitialization(Statement... statements) {
+        this.staticInit = statements;
+    }
+
 
     public Class load() {
         setup();
         setupFields();
         setupConstructors();
-        // TODO constructors
-        // TODO field default value
+        setupStaticConstructor();
         setupMethods();
         this.classWriter.visitEnd();
         this.bytes = classWriter.toByteArray();
@@ -81,8 +93,11 @@ public class ClassBuilder extends Reachable {
 
     private void setup() {
         int modifierValue = getModifiersValue();
-        classWriter.visit(version, modifierValue, getInternalName(), null, ClassConverter.getName(superClass), getInterfacesInternalName());
-        // TODO visitSource ?
+        classWriter.visit(version, modifierValue, getInternalName(), null, superClass, getInterfacesInternalName());
+
+        String[] packageSplit = className.split(Pattern.quote("."));
+        String source = packageSplit[packageSplit.length - 1];
+        classWriter.visitSource(source + ".java", null);
     }
 
     private void setupFields() {
@@ -92,9 +107,37 @@ public class ClassBuilder extends Reachable {
     }
 
     private void setupConstructors() {
+        if (constructors.isEmpty()) {
+            // Add default constructor if empty
+            ConstructorBuilder constructor = ConstructorBuilder.createConstructor();
+            constructor.setModifiers(Modifier.PUBLIC);
+
+            addConstructor(constructor);
+        }
+
         for (ConstructorBuilder constructor : constructors) {
             constructor.loadToWriter(this);
         }
+    }
+
+    private void setupStaticConstructor() {
+
+        MethodBuilder method = MethodBuilder.createMethod("<clinit>", void.class);
+        method.setModifiers(Modifier.STATIC);
+
+        for (FieldBuilder field : getFields()) {
+            if (field.isStatic()) {
+                Object defaultValue = field.getDefaultValue();
+                if (defaultValue != null)
+                    method.addStatement(Statement.setField(field.getFieldName(), Parameter.constant(defaultValue)));
+            }
+        }
+
+        if (staticInit != null) {
+            method.addStatements(staticInit);
+        }
+
+        addMethod(method);
     }
 
     private void setupMethods() {
@@ -138,15 +181,9 @@ public class ClassBuilder extends Reachable {
         return classWriter;
     }
 
-    public FieldVisitor getFieldVisitor() {
-        return fieldVisitor;
-    }
-
-    public MethodVisitor getMethodVisitor() {
-        return methodVisitor;
-    }
-
     protected FieldBuilder findField(String fieldName) {
+        if (fieldName == null || fieldName.isEmpty())
+            throw new IllegalArgumentException("Field name cannot be null or empty");
         for (FieldBuilder field : getFields()) {
             if (field.getFieldName().equals(fieldName))
                 return field;
@@ -154,7 +191,7 @@ public class ClassBuilder extends Reachable {
         throw new IllegalArgumentException("Field " + fieldName + " do not exist!");
     }
 
-    protected String findFieldDescriptor(String fieldName) {
+    protected String getFieldDescriptor(String fieldName) {
         return findField(fieldName).getDescriptor();
     }
 
@@ -163,8 +200,6 @@ public class ClassBuilder extends Reachable {
     }
 
     private String[] getInterfacesInternalName() {
-        if (interfaces == null)
-            return null;
         return ClassConverter.getNames(interfaces);
     }
 

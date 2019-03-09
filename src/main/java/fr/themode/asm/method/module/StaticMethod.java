@@ -2,7 +2,6 @@ package fr.themode.asm.method.module;
 
 import fr.themode.asm.method.CallableModule;
 import fr.themode.asm.method.MethodInstruction;
-import fr.themode.asm.utils.ClassConverter;
 import fr.themode.asm.utils.DescriptorUtils;
 
 import java.util.LinkedList;
@@ -12,12 +11,6 @@ public class StaticMethod extends CallableModule {
     public StaticMethod(LinkedList<MethodInstruction> instructions, String lastType, String clazz, String methodName, String type, String... parameters) {
         super(instructions, lastType, parameters.length);
         addInstruction(clazz, methodName, DescriptorUtils.getDescriptor(type, parameters));
-        setLastType(type);
-    }
-
-    public StaticMethod(LinkedList<MethodInstruction> instructions, String lastType, Class clazz, String methodName, Class type, Class... parameters) {
-        super(instructions, lastType, parameters.length);
-        addInstruction(ClassConverter.getName(clazz), methodName, DescriptorUtils.getDescriptor(type, parameters));
         setLastType(type);
     }
 

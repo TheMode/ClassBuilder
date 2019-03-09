@@ -11,6 +11,7 @@ public class MethodInstruction implements Opcodes {
     private static final int STATIC_METHOD = 2;
 
     private static final int VIRTUAL_METHOD = 3;
+    private static final int SPECIAL_METHOD = 4;
 
     private int opcode;
 
@@ -33,6 +34,9 @@ public class MethodInstruction implements Opcodes {
                 break;
             case VIRTUAL_METHOD:
                 visitor.visitMethodInsn(INVOKEVIRTUAL, clazz, identifier, descriptor, false);
+                break;
+            case SPECIAL_METHOD:
+                visitor.visitMethodInsn(INVOKESPECIAL, clazz, identifier, descriptor, false);
                 break;
         }
     }
@@ -62,14 +66,24 @@ public class MethodInstruction implements Opcodes {
         return getStaticMethod(ClassConverter.getName(clazz), methodName, descriptor);
     }
 
-    public MethodInstruction getMethod(String clazz, String methodName, String descriptor) {
+    public MethodInstruction getVirtualMethod(String clazz, String methodName, String descriptor) {
         opcode = VIRTUAL_METHOD;
         fill(ClassConverter.getName(clazz), methodName, descriptor);
         return this;
     }
 
-    public MethodInstruction getMethod(Class clazz, String methodName, String descriptor) {
-        return getMethod(ClassConverter.getName(clazz), methodName, descriptor);
+    public MethodInstruction getVirtualMethod(Class clazz, String methodName, String descriptor) {
+        return getVirtualMethod(ClassConverter.getName(clazz), methodName, descriptor);
+    }
+
+    public MethodInstruction getSpecialMethod(String clazz, String methodName, String descriptor) {
+        opcode = SPECIAL_METHOD;
+        fill(ClassConverter.getName(clazz), methodName, descriptor);
+        return this;
+    }
+
+    public MethodInstruction getSpecialMethod(Class clazz, String methodName, String descriptor) {
+        return getSpecialMethod(ClassConverter.getName(clazz), methodName, descriptor);
     }
 
     private void fill(String clazz, String identifier, String descriptor) {

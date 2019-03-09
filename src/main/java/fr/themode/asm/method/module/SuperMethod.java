@@ -6,11 +6,11 @@ import fr.themode.asm.utils.DescriptorUtils;
 
 import java.util.LinkedList;
 
-public class LocalMethod extends CallableModule {
+public class SuperMethod extends CallableModule {
 
-    public LocalMethod(LinkedList<MethodInstruction> instructions, String lastType, String className, String methodName, String type, String... parameters) {
+    public SuperMethod(LinkedList<MethodInstruction> instructions, String lastType, String superClass, String methodName, String type, String... parameters) {
         super(instructions, lastType, parameters.length);
-        addInstruction(className, methodName, DescriptorUtils.getDescriptor(type, parameters));
+        addInstruction(superClass, methodName, DescriptorUtils.getDescriptor(type, parameters));
         setLastType(type);
     }
 

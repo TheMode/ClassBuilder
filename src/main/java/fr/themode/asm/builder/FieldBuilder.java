@@ -38,7 +38,7 @@ public class FieldBuilder<T> extends Reachable {
         String typeDescriptor = getDescriptor();
         visitor = classWriter.visitField(modifier, fieldName, typeDescriptor, null, null);
         visitor.visitEnd();
-        // TODO default value
+        // default value handled in ConstructorBuilder class
     }
 
     public String getType() {

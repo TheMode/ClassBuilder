@@ -14,14 +14,8 @@ public class FieldMethod extends CallableModule {
         setLastType(type);
     }
 
-    public FieldMethod(LinkedList<MethodInstruction> instructions, String lastType, String methodName, Class type, Class... parameters) {
-        super(instructions, lastType, parameters.length);
-        addInstruction(methodName, DescriptorUtils.getDescriptor(type, parameters));
-        setLastType(type);
-    }
-
     private void addInstruction(String methodName, String descriptor) {
-        getInstructions().add(new MethodInstruction().getMethod(getLastType(), methodName, descriptor));
+        getInstructions().add(new MethodInstruction().getVirtualMethod(getLastType(), methodName, descriptor));
     }
 
 }

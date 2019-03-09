@@ -1,5 +1,6 @@
 package fr.themode.asm;
 
+import fr.themode.asm.test.InheritanceTest;
 import fr.themode.asm.utils.ClassPrint;
 
 public class ASMifierDemo {

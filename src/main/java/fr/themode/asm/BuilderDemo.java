@@ -9,7 +9,6 @@ import fr.themode.asm.utils.ClassVersion;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.UUID;
 
 import static fr.themode.asm.builder.FieldBuilder.createField;
 import static fr.themode.asm.builder.MethodBuilder.createMethod;
@@ -20,8 +19,8 @@ public class BuilderDemo {
         ClassBuilder classBuilder = ClassBuilder.createClass(ClassVersion.V1_8, "com.package.example.SampleClass");
         classBuilder.setModifiers(Modifier.PUBLIC);
 
-        FieldBuilder field = createField(String.class, "fieldName");
-        field.setModifiers(Modifier.PUBLIC);
+        FieldBuilder field = createField(String.class, "fieldName", "value");
+        field.setModifiers(Modifier.PUBLIC, Modifier.STATIC);
         classBuilder.addField(field);
 
         ConstructorBuilder constructor = ConstructorBuilder.createConstructor();
@@ -34,12 +33,12 @@ public class BuilderDemo {
         method.addStatement(Statement.createVariable(String.class, "stringTest", Parameter.constant("a")));
 
         method.addStatement(Statement.setField("fieldName", Parameter.constant("im a const")));
-
         CallableMethod print = MethodFinder.getStaticField(System.class, "out", PrintStream.class).getMethod("println", void.class, String.class).asCallable();
         method.addStatement(Statement.callMethod(print, Parameter.argument(0)));
 
-        CallableMethod randomUUID = MethodFinder.getStaticMethod(UUID.class, "randomUUID", UUID.class).getMethod("toString", String.class).asCallable();
-        method.addStatement(Statement.callMethod(method.asCallable(classBuilder), Parameter.method(randomUUID), Parameter.constant(2)));
+        //CallableMethod argMethod = MethodFinder.getStaticMethod(UUID.class, "randomUUID", UUID.class).getMethod("toString", String.class).asCallable();
+        // CallableMethod argMethod = MethodFinder.getSuperMethod(classBuilder, "toString", String.class).asCallable();
+        // method.addStatement(Statement.callMethod(method.asCallable(classBuilder), Parameter.method(argMethod), Parameter.constant(2)));
 
         // CallableMethod loop = MethodFinder.getStaticMethod(classBuilder.getInternalName(), "main", void.class.getName(), String.class.getName(), int.class.getName()).asCallable();
         // method.addStatement(Statement.callMethod(loop, Parameter.constant("IM A CONST"), Parameter.constant(2)));

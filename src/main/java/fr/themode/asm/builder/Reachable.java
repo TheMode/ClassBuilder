@@ -24,8 +24,12 @@ public class Reachable implements Opcodes {
         return value;
     }
 
+    public boolean hasModifier(Modifier modifier) {
+        return (getModifiersValue() & modifier.getValue()) != 0;
+    }
+
     public boolean isStatic() {
-        return (getModifiersValue() & ACC_STATIC) == ACC_STATIC;
+        return hasModifier(Modifier.STATIC);
     }
 
 }

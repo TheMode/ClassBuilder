@@ -1,6 +1,7 @@
 package fr.themode.asm.builder;
 
 import fr.themode.asm.enums.Modifier;
+import fr.themode.asm.method.CallableMethod;
 import fr.themode.asm.utils.ClassConverter;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -41,13 +42,15 @@ public class ConstructorBuilder extends MethodBuilder {
         methodVisitor = classWriter.visitMethod(modifier, "<init>", descriptor, null, null);
         methodVisitor.visitCode();
 
-        // TODO super/this
         methodVisitor.visitVarInsn(ALOAD, 0);
+        // TODO super/this customization
+        // TODO push parameters
         methodVisitor.visitMethodInsn(INVOKESPECIAL, classBuilder.getSuperclass(), "<init>", "()V", false);
 
         for (FieldBuilder fieldBuilder : classBuilder.getFields()) {
-            Object defaultValue = fieldBuilder.getDefaultValue();
-            if (defaultValue == null)
+            Object defaultValue;
+            // TODO static constructor (remove !isStatic condition)
+            if (fieldBuilder.isStatic() || (defaultValue = fieldBuilder.getDefaultValue()) == null)
                 continue;
             addStatement(Statement.setField(fieldBuilder.getFieldName(), Parameter.constant(defaultValue)));
         }
@@ -58,6 +61,11 @@ public class ConstructorBuilder extends MethodBuilder {
 
         methodVisitor.visitMaxs(0, 0);
         methodVisitor.visitEnd();
+    }
+
+    @Override
+    public CallableMethod asCallable(String className) {
+        throw new UnsupportedOperationException("You cannot call constructor apart from instantiation");
     }
 
     @Override

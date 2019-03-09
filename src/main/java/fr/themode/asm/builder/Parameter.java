@@ -59,26 +59,24 @@ public class Parameter implements Opcodes {
                 break;
             case FIELD:
                 boolean isStatic = classBuilder.isFieldStatic(name);
-                String type = classBuilder.findFieldDescriptor(name);
-                // TODO fix load (if both parameters need it, load before)
+                String type = classBuilder.getFieldDescriptor(name);
                 if (!isStatic)
                     visitor.visitVarInsn(ALOAD, 0);
-
                 visitor.visitFieldInsn(isStatic ? GETSTATIC : GETFIELD, classBuilder.getInternalName(), name, type);
                 break;
             case VARIABLE:
                 int index = method.getVarStoreIndex(name);
+                // TODO iload etc... (primitives check)
                 visitor.visitVarInsn(ALOAD, index);
                 break;
             case ARGUMENT:
-                // TODO static offset ?
                 visitor.visitVarInsn(ALOAD, (int) value + (method.isStatic() ? 0 : 1));
                 break;
             case METHOD:
                 this.method.load(classBuilder, method, visitor, parameters);
                 break;
             case CONSTANT:
-                // TODO CONST_1/2/3 null etc...
+                // TODO CONST_1/2/3 etc...
                 visitor.visitLdcInsn(value == null ? ACONST_NULL : value);
                 break;
         }

@@ -6,18 +6,18 @@ import fr.themode.asm.method.module.StaticMethod;
 
 public interface IMethodFinder {
 
-    StaticMethod getStaticMethod(Class clazz, String methodName, Class type, Class... parameters);
-
     StaticMethod getStaticMethod(String clazz, String methodName, String type, String... parameters);
 
+    StaticMethod getStaticMethod(Class clazz, String methodName, Class type, Class... parameters);
 
-    StaticField getStaticField(Class clazz, String fieldName, Class type);
 
     StaticField getStaticField(String clazz, String fieldName, String type);
 
+    StaticField getStaticField(Class clazz, String fieldName, Class type);
 
-    FieldMethod getMethod(String methodName, Class type, Class... parameters);
 
     FieldMethod getMethod(String methodName, String type, String... parameters);
+
+    FieldMethod getMethod(String methodName, Class type, Class... parameters);
 
 }

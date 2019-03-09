@@ -19,33 +19,33 @@ public class FinderModule implements IMethodFinder {
     }
 
     @Override
-    public StaticMethod getStaticMethod(Class clazz, String methodName, Class type, Class... parameters) {
-        return new StaticMethod(getInstructions(), getLastType(), clazz, methodName, type, parameters);
-    }
-
-    @Override
     public StaticMethod getStaticMethod(String clazz, String methodName, String type, String... parameters) {
-        return new StaticMethod(getInstructions(), getLastType(), clazz, methodName, type, parameters);
+        return new StaticMethod(getInstructions(), getLastType(), ClassConverter.getName(clazz), methodName, ClassConverter.getName(type), ClassConverter.getNames(parameters));
     }
 
     @Override
-    public StaticField getStaticField(Class clazz, String fieldName, Class type) {
-        return new StaticField(getInstructions(), getLastType(), clazz, fieldName, type);
+    public StaticMethod getStaticMethod(Class clazz, String methodName, Class type, Class... parameters) {
+        return getStaticMethod(ClassConverter.getName(clazz), methodName, ClassConverter.getName(type), ClassConverter.getNames(parameters));
     }
 
     @Override
     public StaticField getStaticField(String clazz, String fieldName, String type) {
-        return new StaticField(getInstructions(), getLastType(), clazz, fieldName, type);
+        return new StaticField(getInstructions(), getLastType(), ClassConverter.getName(clazz), fieldName, ClassConverter.getName(type));
     }
 
     @Override
-    public FieldMethod getMethod(String methodName, Class type, Class... parameters) {
-        return new FieldMethod(getInstructions(), getLastType(), methodName, type, parameters);
+    public StaticField getStaticField(Class clazz, String fieldName, Class type) {
+        return getStaticField(ClassConverter.getName(clazz), fieldName, ClassConverter.getName(type));
     }
 
     @Override
     public FieldMethod getMethod(String methodName, String type, String... parameters) {
-        return new FieldMethod(getInstructions(), getLastType(), methodName, type, parameters);
+        return new FieldMethod(getInstructions(), getLastType(), methodName, type, ClassConverter.getNames(parameters));
+    }
+
+    @Override
+    public FieldMethod getMethod(String methodName, Class type, Class... parameters) {
+        return getMethod(methodName, ClassConverter.getName(type), ClassConverter.getNames(parameters));
     }
 
     protected LinkedList<MethodInstruction> getInstructions() {
