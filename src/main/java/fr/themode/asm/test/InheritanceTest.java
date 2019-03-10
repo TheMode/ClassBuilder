@@ -1,17 +1,11 @@
 package fr.themode.asm.test;
 
-import fr.themode.asm.method.MethodFinder;
+public class InheritanceTest {
 
-public class InheritanceTest extends Superclass {
-
-    public static int i = 1;
-
-    static {
-        System.out.println("IM STATIC");
-    }
-
-    public InheritanceTest(int value) {
-        super(value);
-        String test = new MethodFinder().toString();
+    public InheritanceTest() {
+        int a = 1;
+        double b = 2;
+        float c = 3;
+        double test = (a + b) * c / a;
     }
 }

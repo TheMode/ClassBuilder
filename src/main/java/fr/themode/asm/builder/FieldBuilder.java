@@ -5,23 +5,23 @@ import fr.themode.asm.utils.DescriptorUtils;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.FieldVisitor;
 
-public class FieldBuilder<T> extends Reachable {
+public class FieldBuilder extends Reachable {
 
     private String type;
     private String fieldName;
-    private T defaultValue;
+    private Parameter defaultValue;
 
-    public FieldBuilder(String type, String fieldName, T defaultValue) {
+    public FieldBuilder(String type, String fieldName, Parameter defaultValue) {
         this.type = type;
         this.fieldName = fieldName;
         this.defaultValue = defaultValue;
     }
 
-    public static <T> FieldBuilder createField(String type, String fieldName, T defaultValue) {
-        return new FieldBuilder<T>(ClassConverter.getName(type), fieldName, defaultValue);
+    public static FieldBuilder createField(String type, String fieldName, Parameter defaultValue) {
+        return new FieldBuilder(ClassConverter.getName(type), fieldName, defaultValue);
     }
 
-    public static <T> FieldBuilder createField(Class<T> type, String fieldName, T defaultValue) {
+    public static FieldBuilder createField(Class type, String fieldName, Parameter defaultValue) {
         return createField(ClassConverter.getName(type), fieldName, defaultValue);
     }
 
@@ -49,7 +49,7 @@ public class FieldBuilder<T> extends Reachable {
         return fieldName;
     }
 
-    public T getDefaultValue() {
+    public Parameter getDefaultValue() {
         return defaultValue;
     }
 

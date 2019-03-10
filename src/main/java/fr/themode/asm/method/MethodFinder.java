@@ -1,10 +1,7 @@
 package fr.themode.asm.method;
 
 import fr.themode.asm.builder.ClassBuilder;
-import fr.themode.asm.method.module.LocalMethod;
-import fr.themode.asm.method.module.StaticField;
-import fr.themode.asm.method.module.StaticMethod;
-import fr.themode.asm.method.module.SuperMethod;
+import fr.themode.asm.method.module.*;
 import fr.themode.asm.utils.ClassConverter;
 
 import java.util.LinkedList;
@@ -37,17 +34,13 @@ public class MethodFinder {
     }
 
 
-    /*public static LocalConstructor getLocalConstructor(ClassBuilder classBuilder, Class... parameters) {
-        return new LocalConstructor(new LinkedList<>(), null, classBuilder, parameters);
+    public static InitializationMethod newInstance(String className, String... parameters) {
+        return new InitializationMethod(new LinkedList<>(), null, className, parameters);
     }
 
-    public static LocalConstructor getLocalConstructor(ClassBuilder classBuilder, String... parameters) {
-        return new LocalConstructor(new LinkedList<>(), null, classBuilder, parameters);
+    public static InitializationMethod newInstance(Class className, Class... parameters) {
+        return newInstance(ClassConverter.getName(className), ClassConverter.getNames(parameters));
     }
-
-    public static LocalConstructor getLocalConstructor(String className, String... parameters) {
-        return new LocalConstructor(new LinkedList<>(), null, className, parameters);
-    }*/
 
 
     public static StaticMethod getStaticMethod(String clazz, String methodName, String type, String... parameters) {

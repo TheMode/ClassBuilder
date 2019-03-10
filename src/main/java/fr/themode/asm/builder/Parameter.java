@@ -36,8 +36,27 @@ public class Parameter implements Opcodes {
         return new Parameter(ParameterType.ARGUMENT, null, index);
     }
 
-    // TODO only string and primitives
-    public static Parameter constant(Object constant) {
+    public static Parameter constant(int value) {
+        return LDCConstant(value);
+    }
+
+    public static Parameter constant(float value) {
+        return LDCConstant(value);
+    }
+
+    public static Parameter constant(long value) {
+        return LDCConstant(value);
+    }
+
+    public static Parameter constant(double value) {
+        return LDCConstant(value);
+    }
+
+    public static Parameter constant(String value) {
+        return LDCConstant(value);
+    }
+
+    private static Parameter LDCConstant(Object constant) {
         return new Parameter(ParameterType.CONSTANT, null, constant);
     }
 
@@ -48,9 +67,7 @@ public class Parameter implements Opcodes {
         return parameter;
     }
 
-    // TODO new instance (constructor)
-
-    // TODO operator (for primitives and string aside with StringBuilder)
+    // TODO operator (for primitives and string with StringBuilder)
 
     public void push(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
         switch (type) {

@@ -13,6 +13,8 @@ public class MethodInstruction implements Opcodes {
     private static final int VIRTUAL_METHOD = 3;
     private static final int SPECIAL_METHOD = 4;
 
+    private static final int INITIALIZATION = 5;
+
     private int opcode;
 
     // Information
@@ -38,6 +40,11 @@ public class MethodInstruction implements Opcodes {
             case SPECIAL_METHOD:
                 visitor.visitMethodInsn(INVOKESPECIAL, clazz, identifier, descriptor, false);
                 break;
+            case INITIALIZATION:
+                visitor.visitTypeInsn(NEW, clazz);
+                visitor.visitInsn(DUP);
+                visitor.visitMethodInsn(INVOKESPECIAL, clazz, "<init>", descriptor, false);
+                break;
         }
     }
 
@@ -52,18 +59,10 @@ public class MethodInstruction implements Opcodes {
         return this;
     }
 
-    public MethodInstruction getStaticField(Class clazz, String fieldName, String descriptor) {
-        return getStaticField(ClassConverter.getName(clazz), fieldName, descriptor);
-    }
-
     public MethodInstruction getStaticMethod(String clazz, String methodName, String descriptor) {
         opcode = STATIC_METHOD;
         fill(ClassConverter.getName(clazz), methodName, descriptor);
         return this;
-    }
-
-    public MethodInstruction getStaticMethod(Class clazz, String methodName, String descriptor) {
-        return getStaticMethod(ClassConverter.getName(clazz), methodName, descriptor);
     }
 
     public MethodInstruction getVirtualMethod(String clazz, String methodName, String descriptor) {
@@ -72,18 +71,16 @@ public class MethodInstruction implements Opcodes {
         return this;
     }
 
-    public MethodInstruction getVirtualMethod(Class clazz, String methodName, String descriptor) {
-        return getVirtualMethod(ClassConverter.getName(clazz), methodName, descriptor);
-    }
-
     public MethodInstruction getSpecialMethod(String clazz, String methodName, String descriptor) {
         opcode = SPECIAL_METHOD;
         fill(ClassConverter.getName(clazz), methodName, descriptor);
         return this;
     }
 
-    public MethodInstruction getSpecialMethod(Class clazz, String methodName, String descriptor) {
-        return getSpecialMethod(ClassConverter.getName(clazz), methodName, descriptor);
+    public MethodInstruction initialization(String clazz, String descriptor) {
+        opcode = INITIALIZATION;
+        fill(ClassConverter.getName(clazz), null, descriptor);
+        return this;
     }
 
     private void fill(String clazz, String identifier, String descriptor) {

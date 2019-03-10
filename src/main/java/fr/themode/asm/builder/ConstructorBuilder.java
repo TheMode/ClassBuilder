@@ -28,7 +28,7 @@ public class ConstructorBuilder extends MethodBuilder {
     }
 
     public static ConstructorBuilder createConstructor() {
-        return new ConstructorBuilder(null);
+        return new ConstructorBuilder();
     }
 
     @Override
@@ -48,11 +48,11 @@ public class ConstructorBuilder extends MethodBuilder {
         methodVisitor.visitMethodInsn(INVOKESPECIAL, classBuilder.getSuperclass(), "<init>", "()V", false);
 
         for (FieldBuilder fieldBuilder : classBuilder.getFields()) {
-            Object defaultValue;
+            Parameter defaultValue;
             // TODO static constructor (remove !isStatic condition)
             if (fieldBuilder.isStatic() || (defaultValue = fieldBuilder.getDefaultValue()) == null)
                 continue;
-            addStatement(Statement.setField(fieldBuilder.getFieldName(), Parameter.constant(defaultValue)));
+            addStatement(Statement.setField(fieldBuilder.getFieldName(), defaultValue));
         }
 
         setupStatements(classBuilder, methodVisitor);

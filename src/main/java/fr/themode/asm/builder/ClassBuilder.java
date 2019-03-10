@@ -127,9 +127,9 @@ public class ClassBuilder extends Reachable {
 
         for (FieldBuilder field : getFields()) {
             if (field.isStatic()) {
-                Object defaultValue = field.getDefaultValue();
+                Parameter defaultValue = field.getDefaultValue();
                 if (defaultValue != null)
-                    method.addStatement(Statement.setField(field.getFieldName(), Parameter.constant(defaultValue)));
+                    method.addStatement(Statement.setField(field.getFieldName(), defaultValue));
             }
         }
 
