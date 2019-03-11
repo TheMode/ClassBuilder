@@ -16,7 +16,6 @@ import static fr.themode.asm.builder.MethodBuilder.createMethod;
 public class BuilderDemo {
 
     public static void main(String[] args) {
-        // MethodFinder.newInstance(MyClass.class, )
         ClassBuilder classBuilder = ClassBuilder.createClass(ClassVersion.V1_8, "com.package.example.SampleClass");
         classBuilder.setModifiers(Modifier.PUBLIC);
 

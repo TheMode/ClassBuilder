@@ -14,6 +14,6 @@ public class CallableModule extends FinderModule {
     public CallableMethod asCallable() {
         LinkedList<MethodInstruction> instructions = getInstructions();
         MethodInstruction invokable = instructions.pollLast();
-        return new CallableMethod(instructions, invokable, count);
+        return new CallableMethod(instructions, invokable, getLastType(), count);
     }
 }

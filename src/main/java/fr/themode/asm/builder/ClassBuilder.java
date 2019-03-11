@@ -181,7 +181,7 @@ public class ClassBuilder extends Reachable {
         return classWriter;
     }
 
-    protected FieldBuilder findField(String fieldName) {
+    protected FieldBuilder getField(String fieldName) {
         if (fieldName == null || fieldName.isEmpty())
             throw new IllegalArgumentException("Field name cannot be null or empty");
         for (FieldBuilder field : getFields()) {
@@ -192,11 +192,11 @@ public class ClassBuilder extends Reachable {
     }
 
     protected String getFieldDescriptor(String fieldName) {
-        return findField(fieldName).getDescriptor();
+        return getField(fieldName).getDescriptor();
     }
 
     protected boolean isFieldStatic(String fieldName) {
-        return findField(fieldName).isStatic();
+        return getField(fieldName).isStatic();
     }
 
     private String[] getInterfacesInternalName() {

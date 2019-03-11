@@ -18,7 +18,7 @@ public class MethodBuilder extends Reachable {
     private String methodDescriptor;
 
     private Map<String, Integer> varIndexes;
-    private Map<String, Class> varTypes;
+    private Map<String, String> varTypes;
     private int storeIndex;
 
     private List<Statement> statements;
@@ -128,11 +128,11 @@ public class MethodBuilder extends Reachable {
         this.varIndexes.put(varName, index);
     }
 
-    protected Class getVarType(String varName) {
+    protected String getVarType(String varName) {
         return varTypes.get(varName);
     }
 
-    protected void setVarType(String varName, Class type) {
+    protected void setVarType(String varName, String type) {
         this.varTypes.put(varName, type);
     }
 

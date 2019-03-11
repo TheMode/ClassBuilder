@@ -1,6 +1,7 @@
 package fr.themode.asm.builder;
 
 import fr.themode.asm.method.CallableMethod;
+import fr.themode.asm.utils.DescriptorUtils;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 
@@ -109,6 +110,25 @@ public class Parameter implements Opcodes {
 
     public Object getValue() {
         return value;
+    }
+
+    protected String getTypeDescriptor(ClassBuilder classBuilder, MethodBuilder method) {
+        switch (getType()) {
+            case LOCAL:
+                return DescriptorUtils.getDescriptor(classBuilder.getInternalName());
+            case FIELD:
+                return classBuilder.getField(name).getType();
+            case VARIABLE:
+                return method.getVarType(name);
+            case ARGUMENT:
+                return method.getParameters()[(int) value];
+            case METHOD:
+                return method.getType();
+            case CONSTANT:
+                return DescriptorUtils.getDescriptor(value.getClass());
+
+        }
+        return null;
     }
 
     public enum ParameterType {

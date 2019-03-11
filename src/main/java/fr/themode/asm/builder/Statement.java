@@ -1,6 +1,7 @@
 package fr.themode.asm.builder;
 
 import fr.themode.asm.method.CallableMethod;
+import fr.themode.asm.utils.ClassConverter;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -8,24 +9,39 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 public class Statement implements Opcodes {
 
     private StatementCallback callback;
+    private Label label;
 
     private int line;
 
     public Statement(StatementCallback callback) {
         this.callback = callback;
+        this.label = new Label();
     }
 
     public static Statement[] multi(Statement... statements) {
         return statements;
     }
 
-    public static <T> Statement createVariable(Class<T> type, String varName, Parameter defaultValue) {
+    public static Statement createVariable(String type, String varName, Parameter defaultValue) {
         return new Statement((classBuilder, method, visitor) -> {
             int storeIndex = method.generateStoreIndex();
             defaultValue.push(classBuilder, method, visitor);
             visitor.visitVarInsn(ASTORE, storeIndex);
             method.setVarStoreIndex(varName, storeIndex);
+            method.setVarType(varName, ClassConverter.getName(type));
         });
+    }
+
+    public static Statement createVariable(Class type, String varName, Parameter defaultValue) {
+        return createVariable(ClassConverter.getName(type), varName, defaultValue);
+    }
+
+    public static Statement createVariable(String type, String varName) {
+        return createVariable(ClassConverter.getName(type), varName, Parameter.constant(null));
+    }
+
+    public static Statement createVariable(Class type, String varName) {
+        return createVariable(ClassConverter.getName(type), varName, Parameter.constant(null));
     }
 
     // Debug information
@@ -39,10 +55,6 @@ public class Statement implements Opcodes {
             parameter.push(classBuilder, method, visitor);
             visitor.visitVarInsn(ASTORE, index);
         });
-    }
-
-    public static <T> Statement createVariable(Class<T> type, String varName) {
-        return createVariable(type, varName, Parameter.constant(null));
     }
 
     public static <T> Statement setField(String fieldName, Parameter parameter) {
@@ -63,10 +75,13 @@ public class Statement implements Opcodes {
     }
 
     public void append(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
-        Label label = new Label();
         visitor.visitLabel(label);
         visitor.visitLineNumber(line, label);
         this.callback.append(classBuilder, method, visitor);
+    }
+
+    public Label getLabel() {
+        return label;
     }
 
     public interface StatementCallback {

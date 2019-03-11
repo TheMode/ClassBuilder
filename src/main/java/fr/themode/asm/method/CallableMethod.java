@@ -12,12 +12,15 @@ public class CallableMethod {
     private Collection<MethodInstruction> instructions;
     private MethodInstruction invokable;
 
+    private String type;
     private int count;
 
-    public CallableMethod(Collection<MethodInstruction> instructions, MethodInstruction invokable, int argsCount) {
+    public CallableMethod(Collection<MethodInstruction> instructions, MethodInstruction invokable, String type, int argsCount) {
         this.instructions = instructions;
         this.invokable = invokable;
 
+        this.type = type;
+        System.out.println("TYPE: " + type);
         this.count = argsCount;
     }
 
@@ -35,6 +38,10 @@ public class CallableMethod {
         }
 
         invokable.load(visitor);
+    }
+
+    public String getType() {
+        return type;
     }
 
     public int getArgumentCount() {
