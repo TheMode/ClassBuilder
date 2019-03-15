@@ -19,7 +19,7 @@ public class BuilderDemo {
         ClassBuilder classBuilder = ClassBuilder.createClass(ClassVersion.V1_8, "com.package.example.SampleClass");
         classBuilder.setModifiers(Modifier.PUBLIC);
 
-        FieldBuilder field = createField(String.class, "fieldName", Parameter.constant("value"));
+        FieldBuilder field = createField(String.class, "fieldName", Parameter.literal("value"));
         field.setModifiers(Modifier.PUBLIC, Modifier.STATIC);
         classBuilder.addField(field);
 
@@ -28,11 +28,11 @@ public class BuilderDemo {
 
         classBuilder.addConstructor(constructor);
 
-        MethodBuilder method = createMethod("main", void.class, String.class, int.class);
+        MethodBuilder method = createMethod("main", void.class, String.class, int.class, Float.class);
         method.setModifiers(Modifier.PUBLIC);
-        method.addStatement(Statement.createVariable(String.class, "stringTest", Parameter.constant("a")));
+        method.addStatement(Statement.createVariable(String.class, "stringTest", Parameter.literal("a")));
 
-        method.addStatement(Statement.setField("fieldName", Parameter.constant("im a const")));
+        method.addStatement(Statement.setField("fieldName", Parameter.literal("im a const")));
         CallableMethod print = MethodFinder.getStaticField(System.class, "out", PrintStream.class).getMethod("println", void.class, String.class).asCallable();
         method.addStatement(Statement.callMethod(print, Parameter.argument(0)));
 
@@ -50,9 +50,9 @@ public class BuilderDemo {
         try {
             Object obj = result.newInstance();
 
-            Method m = result.getMethod("main", String.class, int.class);
+            Method m = result.getMethod("main", String.class, int.class, Float.class);
             m.setAccessible(true);
-            m.invoke(obj, "stringArg", 554);
+            m.invoke(obj, "stringArg", 554, 2f);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

@@ -37,11 +37,11 @@ public class Statement implements Opcodes {
     }
 
     public static Statement createVariable(String type, String varName) {
-        return createVariable(ClassConverter.getName(type), varName, Parameter.constant(null));
+        return createVariable(ClassConverter.getName(type), varName, Parameter.literal(null));
     }
 
     public static Statement createVariable(Class type, String varName) {
-        return createVariable(ClassConverter.getName(type), varName, Parameter.constant(null));
+        return createVariable(ClassConverter.getName(type), varName, Parameter.literal(null));
     }
 
     // Debug information

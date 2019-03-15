@@ -37,28 +37,28 @@ public class Parameter implements Opcodes {
         return new Parameter(ParameterType.ARGUMENT, null, index);
     }
 
-    public static Parameter constant(int value) {
-        return LDCConstant(value);
+    public static Parameter literal(int value) {
+        return LDCLiteral(value);
     }
 
-    public static Parameter constant(float value) {
-        return LDCConstant(value);
+    public static Parameter literal(float value) {
+        return LDCLiteral(value);
     }
 
-    public static Parameter constant(long value) {
-        return LDCConstant(value);
+    public static Parameter literal(long value) {
+        return LDCLiteral(value);
     }
 
-    public static Parameter constant(double value) {
-        return LDCConstant(value);
+    public static Parameter literal(double value) {
+        return LDCLiteral(value);
     }
 
-    public static Parameter constant(String value) {
-        return LDCConstant(value);
+    public static Parameter literal(String value) {
+        return LDCLiteral(value);
     }
 
-    private static Parameter LDCConstant(Object constant) {
-        return new Parameter(ParameterType.CONSTANT, null, constant);
+    private static Parameter LDCLiteral(Object constant) {
+        return new Parameter(ParameterType.LITERAL, null, constant);
     }
 
     public static Parameter method(CallableMethod method, Parameter... parameters) {
@@ -93,7 +93,7 @@ public class Parameter implements Opcodes {
             case METHOD:
                 this.method.load(classBuilder, method, visitor, parameters);
                 break;
-            case CONSTANT:
+            case LITERAL:
                 // TODO CONST_1/2/3 etc...
                 visitor.visitLdcInsn(value == null ? ACONST_NULL : value);
                 break;
@@ -117,14 +117,14 @@ public class Parameter implements Opcodes {
             case LOCAL:
                 return DescriptorUtils.getDescriptor(classBuilder.getInternalName());
             case FIELD:
-                return classBuilder.getField(name).getType();
+                return classBuilder.getField(name).getDescriptor();
             case VARIABLE:
-                return method.getVarType(name);
+                return DescriptorUtils.getDescriptor(method.getVarType(name));
             case ARGUMENT:
-                return method.getParameters()[(int) value];
+                return DescriptorUtils.getDescriptor(method.getParameters()[(int) value]);
             case METHOD:
-                return method.getType();
-            case CONSTANT:
+                return DescriptorUtils.getDescriptor(method.getType());
+            case LITERAL:
                 return DescriptorUtils.getDescriptor(value.getClass());
 
         }
@@ -132,7 +132,7 @@ public class Parameter implements Opcodes {
     }
 
     public enum ParameterType {
-        LOCAL, FIELD, VARIABLE, ARGUMENT, METHOD, CONSTANT
+        LOCAL, FIELD, VARIABLE, ARGUMENT, METHOD, LITERAL
     }
 
 }

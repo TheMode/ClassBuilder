@@ -50,6 +50,7 @@ public class DescriptorUtils {
         } else if (internalName.equals("float")) {
             return "F";
         }
+
         return Type.getObjectType(internalName).getDescriptor().replace(".", "/");
     }
 

@@ -1,8 +1,10 @@
 package fr.themode.asm.builder;
 
 import jdk.internal.org.objectweb.asm.Label;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 
-public class BooleanExpression {
+public class BooleanExpression implements Opcodes {
 
     private static final int EQUAL = 1;
 
@@ -10,12 +12,14 @@ public class BooleanExpression {
     private Parameter param2;
     private int type;
 
+    private int opcode;
+
     private BooleanExpression(Parameter param1, Parameter param2, int type) {
-        if (param1.getType() == Parameter.ParameterType.CONSTANT && param2.getType() == Parameter.ParameterType.CONSTANT)
-            throw new IllegalArgumentException("You shouldn't compare two constant value (do it yourself)");
         this.param1 = param1;
         this.param2 = param2;
         this.type = type;
+
+        setupOpcode();
     }
 
 
@@ -27,10 +31,16 @@ public class BooleanExpression {
         return new BooleanExpression(param1, param2, EQUAL);
     }
 
-    protected void loadToWriter(ClassBuilder classBuilder, Label jumpLabel) {
-        // TODO load both parameters
+    protected void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, Label jumpLabel) {
+        param1.push(classBuilder, method, visitor);
         // TODO cast if necessary
-        // TODO jump wth jumpLabel as location
+        param2.push(classBuilder, method, visitor);
+        visitor.visitJumpInsn(opcode, jumpLabel);
+    }
+
+    private void setupOpcode() {
+        // TODO switch type
+        this.opcode = 0;
     }
 
 }
