@@ -1,5 +1,6 @@
 package fr.themode.asm.builder;
 
+import fr.themode.asm.builder.flow.FlowControl;
 import fr.themode.asm.method.CallableMethod;
 import fr.themode.asm.utils.ClassConverter;
 import jdk.internal.org.objectweb.asm.Label;
@@ -8,14 +9,14 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 
 public class Statement implements Opcodes {
 
+    private static Label nextLabel;
+
     private StatementCallback callback;
-    private Label label;
 
     private int line;
 
     public Statement(StatementCallback callback) {
         this.callback = callback;
-        this.label = new Label();
     }
 
     public static Statement[] multi(Statement... statements) {
@@ -26,7 +27,8 @@ public class Statement implements Opcodes {
         return new Statement((classBuilder, method, visitor) -> {
             int storeIndex = method.generateStoreIndex();
             defaultValue.push(classBuilder, method, visitor);
-            visitor.visitVarInsn(ASTORE, storeIndex);
+            visitor.visitVarInsn(defaultValue.getStoreOpcode(classBuilder, method), storeIndex);
+
             method.setVarStoreIndex(varName, storeIndex);
             method.setVarType(varName, ClassConverter.getName(type));
         });
@@ -44,20 +46,15 @@ public class Statement implements Opcodes {
         return createVariable(ClassConverter.getName(type), varName, Parameter.literal(null));
     }
 
-    // Debug information
-    public void setLineNumber(int line) {
-        this.line = line;
-    }
-
-    public static <T> Statement setVariable(String varName, Parameter parameter) {
+    public static Statement setVariable(String varName, Parameter parameter) {
         return new Statement((classBuilder, method, visitor) -> {
             int index = method.getVarStoreIndex(varName);
             parameter.push(classBuilder, method, visitor);
-            visitor.visitVarInsn(ASTORE, index);
+            visitor.visitVarInsn(parameter.getStoreOpcode(classBuilder, method), index);
         });
     }
 
-    public static <T> Statement setField(String fieldName, Parameter parameter) {
+    public static Statement setField(String fieldName, Parameter parameter) {
         return new Statement((classBuilder, method, visitor) -> {
             boolean isStatic = classBuilder.isFieldStatic(fieldName);
             String type = classBuilder.getFieldDescriptor(fieldName);
@@ -68,20 +65,39 @@ public class Statement implements Opcodes {
         });
     }
 
-    public static <T> Statement callMethod(CallableMethod callableMethod, Parameter... parameters) {
+    public static Statement callMethod(CallableMethod callableMethod, Parameter... parameters) {
         return new Statement((classBuilder, method, visitor) -> {
             callableMethod.load(classBuilder, method, visitor, parameters);
         });
     }
 
+    public static Statement createFlowControl(FlowControl flowControl) {
+        return new Statement((classBuilder, method, visitor) -> {
+            flowControl.loadToWriter(classBuilder, method, visitor);
+        });
+    }
+
+    public static void setNextLabel(Label nextLabel) {
+        Statement.nextLabel = nextLabel;
+    }
+
     public void append(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
+        Label label = null;
+        if (nextLabel != null) {
+            label = nextLabel;
+            nextLabel = null;
+        } else {
+            label = new Label();
+        }
+
         visitor.visitLabel(label);
         visitor.visitLineNumber(line, label);
         this.callback.append(classBuilder, method, visitor);
     }
 
-    public Label getLabel() {
-        return label;
+    // Debug information
+    public void setLineNumber(int line) {
+        this.line = line;
     }
 
     public interface StatementCallback {

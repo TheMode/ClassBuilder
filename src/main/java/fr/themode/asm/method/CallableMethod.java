@@ -20,7 +20,6 @@ public class CallableMethod {
         this.invokable = invokable;
 
         this.type = type;
-        System.out.println("TYPE: " + type);
         this.count = argsCount;
     }
 

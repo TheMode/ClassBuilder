@@ -1,6 +1,7 @@
 package fr.themode.asm;
 
 import fr.themode.asm.builder.*;
+import fr.themode.asm.builder.flow.FlowControl;
 import fr.themode.asm.enums.Modifier;
 import fr.themode.asm.method.CallableMethod;
 import fr.themode.asm.method.MethodFinder;
@@ -10,7 +11,6 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static fr.themode.asm.builder.FieldBuilder.createField;
 import static fr.themode.asm.builder.MethodBuilder.createMethod;
 
 public class BuilderDemo {
@@ -19,9 +19,9 @@ public class BuilderDemo {
         ClassBuilder classBuilder = ClassBuilder.createClass(ClassVersion.V1_8, "com.package.example.SampleClass");
         classBuilder.setModifiers(Modifier.PUBLIC);
 
-        FieldBuilder field = createField(String.class, "fieldName", Parameter.literal("value"));
-        field.setModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        classBuilder.addField(field);
+        //FieldBuilder field = createField(String.class, "fieldName", Parameter.literal("value"));
+        //field.setModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        //classBuilder.addField(field);
 
         ConstructorBuilder constructor = ConstructorBuilder.createConstructor();
         constructor.setModifiers(Modifier.PUBLIC);
@@ -30,11 +30,18 @@ public class BuilderDemo {
 
         MethodBuilder method = createMethod("main", void.class, String.class, int.class, Float.class);
         method.setModifiers(Modifier.PUBLIC);
-        method.addStatement(Statement.createVariable(String.class, "stringTest", Parameter.literal("a")));
+        method.addStatement(Statement.createVariable(int.class, "varTest", Parameter.literal(3)));
 
-        method.addStatement(Statement.setField("fieldName", Parameter.literal("im a const")));
         CallableMethod print = MethodFinder.getStaticField(System.class, "out", PrintStream.class).getMethod("println", void.class, String.class).asCallable();
-        method.addStatement(Statement.callMethod(print, Parameter.argument(0)));
+
+        BooleanExpression[] conditions = BooleanExpression.multi(BooleanExpression.not_equal(Parameter.variable("varTest"), Parameter.literal(2)));
+        Statement[] statements = Statement.multi(Statement.setVariable("varTest", Parameter.literal(5)), Statement.callMethod(print, Parameter.literal("CONDITION TRUE")));
+        FlowControl flow = FlowControl.if_(conditions, statements);
+        method.addStatements(Statement.createFlowControl(flow));
+
+        method.addStatement(Statement.setVariable("varTest", Parameter.literal(3)));
+
+        //method.addStatement(Statement.setField("fieldName", Parameter.literal("im a const")));//method.addStatement(Statement.callMethod(print, Parameter.argument(0)));
 
         //CallableMethod argMethod = MethodFinder.getStaticMethod(UUID.class, "randomUUID", UUID.class).getMethod("toString", String.class).asCallable();
         // CallableMethod argMethod = MethodFinder.getSuperMethod(classBuilder, "toString", String.class).asCallable();

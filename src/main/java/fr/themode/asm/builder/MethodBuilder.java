@@ -64,7 +64,6 @@ public class MethodBuilder extends Reachable {
     }
 
     protected void setupStatements(ClassBuilder classBuilder, MethodVisitor visitor) {
-        // TODO flow control
         for (Statement statement : statements) {
             statement.append(classBuilder, this, visitor);
         }
