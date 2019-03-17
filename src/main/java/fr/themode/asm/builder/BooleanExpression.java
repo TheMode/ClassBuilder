@@ -7,8 +7,20 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 
 public class BooleanExpression implements Opcodes {
 
-    private static final int EQUAL = 1;
-    private static final int NOT_EQUAL = 2;
+    private static final int NULL = 0;
+    private static final int NOT_NULL = 1;
+
+    private static final int EQUAL = 2;
+    private static final int NOT_EQUAL = 3;
+
+    private static final int LESS = 4;
+    private static final int LESS_EQUAL = 5;
+
+    private static final int GREATER = 6;
+    private static final int GREATER_EQUAL = 7;
+
+    private static final int IS_TRUE = 8;
+    private static final int IS_FALSE = 9;
 
     private Parameter param1;
     private Parameter param2;
@@ -29,6 +41,14 @@ public class BooleanExpression implements Opcodes {
         return expressions;
     }
 
+    public static BooleanExpression is_null(Parameter param) {
+        return new BooleanExpression(param, null, NULL);
+    }
+
+    public static BooleanExpression not_null(Parameter param) {
+        return new BooleanExpression(param, null, NOT_NULL);
+    }
+
     public static BooleanExpression equal(Parameter param1, Parameter param2) {
         return new BooleanExpression(param1, param2, EQUAL);
     }
@@ -37,24 +57,58 @@ public class BooleanExpression implements Opcodes {
         return new BooleanExpression(param1, param2, NOT_EQUAL);
     }
 
+    public static BooleanExpression less(Parameter param1, Parameter param2) {
+        return new BooleanExpression(param1, param2, LESS);
+    }
+
+    public static BooleanExpression less_equal(Parameter param1, Parameter param2) {
+        return new BooleanExpression(param1, param2, LESS_EQUAL);
+    }
+
+    public static BooleanExpression greater(Parameter param1, Parameter param2) {
+        return new BooleanExpression(param1, param2, GREATER);
+    }
+
+    public static BooleanExpression greater_equal(Parameter param1, Parameter param2) {
+        return new BooleanExpression(param1, param2, GREATER_EQUAL);
+    }
+
+    public static BooleanExpression is_true(Parameter param1, Parameter param2) {
+        return new BooleanExpression(param1, param2, IS_TRUE);
+    }
+
+    public static BooleanExpression is_false(Parameter param1, Parameter param2) {
+        return new BooleanExpression(param1, param2, IS_FALSE);
+    }
+
     public void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, Label jumpLabel) {
         String type1 = param1.getTypeDescriptor(classBuilder, method);
-        String type2 = param2.getTypeDescriptor(classBuilder, method);
 
-        int[] cast = getCast(type1, type2);
-        System.out.println("testtype: " + type1 + " : " + type2);
+        // param2 is null when condition is NULL/NOT_NULL/IS_TRUE/IS_FALSE
+        if (param2 != null) {
+            String type2 = param2.getTypeDescriptor(classBuilder, method);
 
-        param1.push(classBuilder, method, visitor);
-        visitCast(visitor, cast[0]);
-        param2.push(classBuilder, method, visitor);
-        visitCast(visitor, cast[1]);
-        compare(visitor);
+            int[] cast = getCast(type1, type2);
+            System.out.println("testtype: " + type1 + " : " + type2);
+
+            param1.push(classBuilder, method, visitor);
+            visitCast(visitor, cast[0]);
+            param2.push(classBuilder, method, visitor);
+            visitCast(visitor, cast[1]);
+            compare(visitor);
+        } else {
+            param1.push(classBuilder, method, visitor);
+        }
+
         visitor.visitJumpInsn(getOpcode(), jumpLabel);
     }
 
     private int getOpcode() {
-        if (type == EQUAL) {
-            // Opcode set to "not equal"
+        if (type == NULL) {
+            return IFNONNULL;
+        } else if (type == NOT_NULL) {
+            return IFNULL;
+        } else if (type == EQUAL) {
             if (checkReference) {
                 return IF_ACMPNE;
             } else {
@@ -67,9 +121,24 @@ public class BooleanExpression implements Opcodes {
                 return IF_ICMPEQ;
             }
         } else if (checkReference) {
-            throw new IllegalArgumentException("Reference can be used as BooleanExpression only when applied with equal/not_equal condition");
+            throw new IllegalArgumentException("Reference can be used as BooleanExpression only when applied with is_null/equal/not_equal condition");
         }
-        // TODO others
+
+        switch (type) {
+            case LESS:
+                return IFGE;
+            case LESS_EQUAL:
+                return IFGT;
+            case GREATER:
+                return IFLE;
+            case GREATER_EQUAL:
+                return IFLT;
+            case IS_TRUE:
+                return IFEQ;
+            case IS_FALSE:
+                return IFNE;
+        }
+
         return 0;
     }
 

@@ -7,6 +7,7 @@ import fr.themode.asm.builder.Statement;
 import fr.themode.asm.builder.flow.FlowControl;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +43,13 @@ public class IfControl extends FlowControl {
         return label;
     }
 
-    private Label loadElseIf(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, List<FlowHandler> list, Label label) {
+    private Label loadElseIf(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, List<FlowHandler> list, Label label, Label gotoLabel) {
         // Else if labels
         for (FlowHandler handler : list) {
             Statement.setNextLabel(label);
             label = new Label();
             handler.loadToWriter(classBuilder, method, visitor, label);
+            visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
         }
         return label;
     }
@@ -81,11 +83,13 @@ public class IfControl extends FlowControl {
         @Override
         public void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
             Label label = loadMain(classBuilder, method, visitor);
+            Label gotoLabel = new Label();
+            visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
 
-            label = loadElseIf(classBuilder, method, visitor, list, label);
+            label = loadElseIf(classBuilder, method, visitor, list, label, gotoLabel);
 
             // Next instructions
-            Statement.setNextLabel(label);
+            Statement.setNextLabel(gotoLabel);
         }
     }
 
@@ -104,14 +108,18 @@ public class IfControl extends FlowControl {
         @Override
         public void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
             Label label = loadMain(classBuilder, method, visitor);
+            Label gotoLabel = new Label();
+            visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
 
-            label = loadElseIf(classBuilder, method, visitor, list, label);
+            label = loadElseIf(classBuilder, method, visitor, list, label, gotoLabel);
 
             // Else label
             Statement.setNextLabel(label);
             for (Statement statement : elseStatements) {
                 statement.append(classBuilder, method, visitor);
             }
+
+            Statement.setNextLabel(gotoLabel);
         }
     }
 

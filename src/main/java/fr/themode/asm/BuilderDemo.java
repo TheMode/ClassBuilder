@@ -30,13 +30,14 @@ public class BuilderDemo {
 
         MethodBuilder method = createMethod("main", void.class, String.class, int.class, Float.class);
         method.setModifiers(Modifier.PUBLIC);
-        method.addStatement(Statement.createVariable(int.class, "varTest", Parameter.literal(3)));
+        method.addStatement(Statement.createVariable(String.class, "varTest", Parameter.literal("aa")));
 
         CallableMethod print = MethodFinder.getStaticField(System.class, "out", PrintStream.class).getMethod("println", void.class, String.class).asCallable();
 
-        BooleanExpression[] conditions = BooleanExpression.multi(BooleanExpression.not_equal(Parameter.variable("varTest"), Parameter.literal(2)));
+        //BooleanExpression[] conditions = BooleanExpression.multi(BooleanExpression.not_equal(Parameter.variable("varTest"), Parameter.literal(2)));
+        BooleanExpression[] conditions = BooleanExpression.multi(BooleanExpression.not_null(Parameter.variable("varTest")));
         Statement[] statements = Statement.multi(Statement.setVariable("varTest", Parameter.literal(5)), Statement.callMethod(print, Parameter.literal("CONDITION TRUE")));
-        FlowControl flow = FlowControl.if_(conditions, statements);
+        FlowControl flow = FlowControl.if_(conditions, statements).else_(Statement.callMethod(print, Parameter.literal("CONDITION FALSE")));
         method.addStatements(Statement.createFlowControl(flow));
 
         method.addStatement(Statement.setVariable("varTest", Parameter.literal(3)));
