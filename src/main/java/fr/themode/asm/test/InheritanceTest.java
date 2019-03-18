@@ -3,13 +3,11 @@ package fr.themode.asm.test;
 public class InheritanceTest {
 
     public InheritanceTest() {
-        Object test = null;
-        if (test != null) {
-            System.out.println("TRUE");
-        } else if (test == "a") {
-            System.out.println("FALSE");
+        int var1 = 5;
+        int var2 = 10;
+        if (var1 >= var2) {
+            System.out.println("test");
         }
-        System.out.println("OUT");
     }
 
 }

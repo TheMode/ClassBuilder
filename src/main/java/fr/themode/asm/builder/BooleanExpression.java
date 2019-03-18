@@ -124,19 +124,34 @@ public class BooleanExpression implements Opcodes {
             throw new IllegalArgumentException("Reference can be used as BooleanExpression only when applied with is_null/equal/not_equal condition");
         }
 
-        switch (type) {
-            case LESS:
-                return IFGE;
-            case LESS_EQUAL:
-                return IFGT;
-            case GREATER:
-                return IFLE;
-            case GREATER_EQUAL:
-                return IFLT;
-            case IS_TRUE:
-                return IFEQ;
-            case IS_FALSE:
-                return IFNE;
+        if (type == IS_TRUE) {
+            return IFEQ;
+        } else if (type == IS_FALSE) {
+            return IFNE;
+        }
+
+        if (mainType.equals(DescriptorUtils.INTEGER)) {
+            switch (type) {
+                case LESS:
+                    return IF_ICMPGE;
+                case LESS_EQUAL:
+                    return IF_ICMPGT;
+                case GREATER:
+                    return IF_ICMPLE;
+                case GREATER_EQUAL:
+                    return IF_ICMPLT;
+            }
+        } else {
+            switch (type) {
+                case LESS:
+                    return IFGE;
+                case LESS_EQUAL:
+                    return IFGT;
+                case GREATER:
+                    return IFLE;
+                case GREATER_EQUAL:
+                    return IFLT;
+            }
         }
 
         return 0;

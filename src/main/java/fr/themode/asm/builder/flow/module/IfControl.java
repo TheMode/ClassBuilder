@@ -47,12 +47,13 @@ public class IfControl extends FlowControl {
         return label;
     }
 
-    private Label loadElseIf(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, List<FlowHandler> list, Label label, Label gotoLabel) {
+    private Label loadElseIf(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, List<FlowHandler> list, Label label, Label falseLabel, Label gotoLabel) {
         // Else if labels
-        //Statement.setNextLabel(label);
-        for (FlowHandler handler : list) {
+        for (int i = 0; i < list.size(); i++) {
+            FlowHandler handler = list.get(i);
+            boolean isLast = i == list.size() - 1;
             visitor.visitLabel(label);
-            label = new Label();
+            label = isLast ? falseLabel : new Label();
             handler.loadToWriter(classBuilder, method, visitor, label);
             visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
         }
@@ -91,12 +92,11 @@ public class IfControl extends FlowControl {
 
         @Override
         public void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
-            // TODO loadMain jump to elseif
             Label label = loadMain(classBuilder, method, visitor);
             Label gotoLabel = new Label();
             visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
 
-            label = loadElseIf(classBuilder, method, visitor, list, label, gotoLabel);
+            label = loadElseIf(classBuilder, method, visitor, list, label, gotoLabel, gotoLabel);
 
             // Next instructions
             Statement.setNextLabel(gotoLabel);
@@ -121,10 +121,12 @@ public class IfControl extends FlowControl {
             Label gotoLabel = new Label();
             visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
 
-            label = loadElseIf(classBuilder, method, visitor, list, label, gotoLabel);
+            Label elseLabel = new Label();
+
+            label = loadElseIf(classBuilder, method, visitor, list, label, elseLabel, gotoLabel);
 
             // Else label
-            Statement.setNextLabel(label);
+            Statement.setNextLabel(elseLabel);
             for (Statement statement : elseStatements) {
                 statement.append(classBuilder, method, visitor);
             }
