@@ -29,7 +29,7 @@ classBuilder.addField(field);
 // void is the return type, String and int are arguments
 MethodBuilder method = MethodBuilder.createMethod("main", void.class, String.class, int.class);
 method.setModifiers(Modifier.PUBLIC, Modifier.STATIC);
-method.addStatement(Statement.createVariable(String.class, "varName", Parameter.constant("default value")));
+method.addStatement(Statement.createVariable(String.class, "varName", Parameter.literal("default value")));
 ...
 classBuilder.addMethod(method);
 ```
@@ -39,4 +39,12 @@ Statements are the core of the library, without statement your code won't do any
 It includes field/variable manipulation and method execution
 
 ### Flow control ###
-In progress
+```java
+BooleanExpression[] conditions = BooleanExpression.multi(BooleanExpression.not_null(Parameter.variable("varTest")));
+Statement[] statements = Statement.multi(Statement.setVariable("varTest", Parameter.literal("bb")), Statement.callMethod(print, Parameter.literal("CONDITION TRUE")));
+
+FlowControl flow = FlowControl.if_(conditions, statements)
+                .else_if(BooleanExpression.greater(Parameter.literal(1), Parameter.literal(1)), Statement.callMethod(print, Parameter.literal("ELSE IF")))
+                .else_(Statement.callMethod(print, Parameter.literal("CONDITION FALSE")));
+method.addStatements(Statement.createFlowControl(flow));
+```
