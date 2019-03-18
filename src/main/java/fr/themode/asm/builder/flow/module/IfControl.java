@@ -24,6 +24,10 @@ public class IfControl extends FlowControl {
         return new ElseIfControl(mainHandler, createHandler(conditions, statements));
     }
 
+    public ElseIfControl else_if(BooleanExpression condition, Statement... statements) {
+        return else_if(new BooleanExpression[]{condition}, statements);
+    }
+
     public ElseControl else_(Statement... statements) {
         return new ElseControl(mainHandler, new ArrayList<>(), statements);
     }
@@ -45,8 +49,9 @@ public class IfControl extends FlowControl {
 
     private Label loadElseIf(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, List<FlowHandler> list, Label label, Label gotoLabel) {
         // Else if labels
+        Statement.setNextLabel(label);
         for (FlowHandler handler : list) {
-            Statement.setNextLabel(label);
+            //visitor.visitLabel(label);
             label = new Label();
             handler.loadToWriter(classBuilder, method, visitor, label);
             visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
@@ -76,12 +81,17 @@ public class IfControl extends FlowControl {
             return this;
         }
 
+        public ElseIfControl else_if(BooleanExpression condition, Statement... statements) {
+            return else_if(new BooleanExpression[]{condition}, statements);
+        }
+
         public ElseControl else_(Statement... statements) {
             return new ElseControl(mainHandler, list, statements);
         }
 
         @Override
         public void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
+            // TODO loadMain jump to elseif
             Label label = loadMain(classBuilder, method, visitor);
             Label gotoLabel = new Label();
             visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
@@ -127,9 +137,9 @@ public class IfControl extends FlowControl {
         private BooleanExpression[] conditions;
         private Statement[] statements;
 
-        private void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, Label label) {
+        private void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, Label jumpLabel) {
             for (BooleanExpression condition : conditions) {
-                condition.loadToWriter(classBuilder, method, visitor, label);
+                condition.loadToWriter(classBuilder, method, visitor, jumpLabel);
             }
 
             for (Statement statement : statements) {

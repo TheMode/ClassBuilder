@@ -184,6 +184,8 @@ public class BooleanExpression implements Opcodes {
                 mainType = maxType;
                 cast[priority1 == min ? 0 : 1] = getCastOpcode(minType, maxType);
             }
+        } else {
+            mainType = type1;
         }
 
         return cast;

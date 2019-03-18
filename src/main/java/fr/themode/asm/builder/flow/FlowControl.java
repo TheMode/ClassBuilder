@@ -13,6 +13,10 @@ public class FlowControl {
         return new IfControl(conditions, statements);
     }
 
+    public static IfControl if_(BooleanExpression condition, Statement... statements) {
+        return if_(new BooleanExpression[]{condition}, statements);
+    }
+
     public void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor) {
 
     }

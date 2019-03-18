@@ -6,9 +6,10 @@ public class InheritanceTest {
         Object test = null;
         if (test != null) {
             System.out.println("TRUE");
-        } else {
+        } else if (test == "a") {
             System.out.println("FALSE");
         }
+        System.out.println("OUT");
     }
 
 }

@@ -7,6 +7,9 @@ import fr.themode.asm.method.CallableMethod;
 import fr.themode.asm.method.MethodFinder;
 import fr.themode.asm.utils.ClassVersion;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,11 +39,14 @@ public class BuilderDemo {
 
         //BooleanExpression[] conditions = BooleanExpression.multi(BooleanExpression.not_equal(Parameter.variable("varTest"), Parameter.literal(2)));
         BooleanExpression[] conditions = BooleanExpression.multi(BooleanExpression.not_null(Parameter.variable("varTest")));
-        Statement[] statements = Statement.multi(Statement.setVariable("varTest", Parameter.literal(5)), Statement.callMethod(print, Parameter.literal("CONDITION TRUE")));
-        FlowControl flow = FlowControl.if_(conditions, statements).else_(Statement.callMethod(print, Parameter.literal("CONDITION FALSE")));
+        Statement[] statements = Statement.multi(Statement.setVariable("varTest", Parameter.literal("bb")), Statement.callMethod(print, Parameter.literal("CONDITION TRUE")));
+
+        FlowControl flow = FlowControl.if_(conditions, statements)
+                .else_if(BooleanExpression.greater(Parameter.literal(1), Parameter.literal(1)), Statement.callMethod(print, Parameter.literal("ELSE IF")));
+        //.else_(Statement.callMethod(print, Parameter.literal("CONDITION FALSE")));
         method.addStatements(Statement.createFlowControl(flow));
 
-        method.addStatement(Statement.setVariable("varTest", Parameter.literal(3)));
+        method.addStatement(Statement.setVariable("varTest", Parameter.literal("a")));
 
         //method.addStatement(Statement.setField("fieldName", Parameter.literal("im a const")));//method.addStatement(Statement.callMethod(print, Parameter.argument(0)));
 
@@ -54,6 +60,14 @@ public class BuilderDemo {
         classBuilder.addMethod(method);
 
         Class result = classBuilder.load();
+
+        try (FileOutputStream fos = new FileOutputStream("file.class")) {
+            fos.write(classBuilder.getBytes());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             Object obj = result.newInstance();
