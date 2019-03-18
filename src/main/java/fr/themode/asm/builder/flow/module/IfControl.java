@@ -49,9 +49,9 @@ public class IfControl extends FlowControl {
 
     private Label loadElseIf(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, List<FlowHandler> list, Label label, Label gotoLabel) {
         // Else if labels
-        Statement.setNextLabel(label);
+        //Statement.setNextLabel(label);
         for (FlowHandler handler : list) {
-            //visitor.visitLabel(label);
+            visitor.visitLabel(label);
             label = new Label();
             handler.loadToWriter(classBuilder, method, visitor, label);
             visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
