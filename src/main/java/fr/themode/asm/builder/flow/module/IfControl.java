@@ -60,10 +60,6 @@ public class IfControl extends FlowControl {
         }
     }
 
-    private FlowHandler createHandler(BooleanExpression[] conditions, Statement[] statements) {
-        return new FlowHandler(conditions, statements);
-    }
-
     public class ElseIfControl extends FlowControl {
         private FlowHandler mainHandler;
         private List<FlowHandler> list;
