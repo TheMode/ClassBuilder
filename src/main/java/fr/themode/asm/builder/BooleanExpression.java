@@ -89,7 +89,6 @@ public class BooleanExpression implements Opcodes {
             String type2 = param2.getTypeDescriptor(classBuilder, method);
 
             int[] cast = getCast(type1, type2);
-            System.out.println("testtype: " + type1 + " : " + type2);
 
             param1.push(classBuilder, method, visitor);
             visitCast(visitor, cast[0]);

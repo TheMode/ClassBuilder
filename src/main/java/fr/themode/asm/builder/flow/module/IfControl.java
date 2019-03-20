@@ -5,6 +5,7 @@ import fr.themode.asm.builder.ClassBuilder;
 import fr.themode.asm.builder.MethodBuilder;
 import fr.themode.asm.builder.Statement;
 import fr.themode.asm.builder.flow.FlowControl;
+import fr.themode.asm.builder.flow.FlowHandler;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -47,7 +48,7 @@ public class IfControl extends FlowControl {
         return label;
     }
 
-    private Label loadElseIf(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, List<FlowHandler> list, Label label, Label falseLabel, Label gotoLabel) {
+    private void loadElseIf(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, List<FlowHandler> list, Label label, Label falseLabel, Label gotoLabel) {
         // Else if labels
         for (int i = 0; i < list.size(); i++) {
             FlowHandler handler = list.get(i);
@@ -57,14 +58,10 @@ public class IfControl extends FlowControl {
             handler.loadToWriter(classBuilder, method, visitor, label);
             visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
         }
-        return label;
     }
 
     private FlowHandler createHandler(BooleanExpression[] conditions, Statement[] statements) {
-        FlowHandler handler = new FlowHandler();
-        handler.conditions = conditions;
-        handler.statements = statements;
-        return handler;
+        return new FlowHandler(conditions, statements);
     }
 
     public class ElseIfControl extends FlowControl {
@@ -96,7 +93,7 @@ public class IfControl extends FlowControl {
             Label gotoLabel = new Label();
             visitor.visitJumpInsn(Opcodes.GOTO, gotoLabel);
 
-            label = loadElseIf(classBuilder, method, visitor, list, label, gotoLabel, gotoLabel);
+            loadElseIf(classBuilder, method, visitor, list, label, gotoLabel, gotoLabel);
 
             // Next instructions
             Statement.setNextLabel(gotoLabel);
@@ -123,7 +120,7 @@ public class IfControl extends FlowControl {
 
             Label elseLabel = new Label();
 
-            label = loadElseIf(classBuilder, method, visitor, list, label, elseLabel, gotoLabel);
+            loadElseIf(classBuilder, method, visitor, list, label, elseLabel, gotoLabel);
 
             // Else label
             Statement.setNextLabel(elseLabel);
@@ -132,21 +129,6 @@ public class IfControl extends FlowControl {
             }
 
             Statement.setNextLabel(gotoLabel);
-        }
-    }
-
-    private class FlowHandler {
-        private BooleanExpression[] conditions;
-        private Statement[] statements;
-
-        private void loadToWriter(ClassBuilder classBuilder, MethodBuilder method, MethodVisitor visitor, Label jumpLabel) {
-            for (BooleanExpression condition : conditions) {
-                condition.loadToWriter(classBuilder, method, visitor, jumpLabel);
-            }
-
-            for (Statement statement : statements) {
-                statement.append(classBuilder, method, visitor);
-            }
         }
     }
 }

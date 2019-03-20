@@ -19,6 +19,7 @@ import static fr.themode.asm.builder.MethodBuilder.createMethod;
 public class BuilderDemo {
 
     public static void main(String[] args) {
+        long time = System.currentTimeMillis();
         ClassBuilder classBuilder = ClassBuilder.createClass(ClassVersion.V1_8, "com.package.example.SampleClass");
         classBuilder.setModifiers(Modifier.PUBLIC);
 
@@ -42,8 +43,8 @@ public class BuilderDemo {
         Statement[] statements = Statement.multi(Statement.setVariable("varTest", Parameter.literal("bb")), Statement.callMethod(print, Parameter.literal("CONDITION TRUE")));
 
         FlowControl flow = FlowControl.if_(conditions, statements)
-                .else_if(BooleanExpression.greater(Parameter.literal(1), Parameter.literal(1)), Statement.callMethod(print, Parameter.literal("ELSE IF")));
-        //.else_(Statement.callMethod(print, Parameter.literal("CONDITION FALSE")));
+                .else_if(BooleanExpression.greater(Parameter.literal(1), Parameter.literal(1)), Statement.callMethod(print, Parameter.literal("ELSE IF")))
+                .else_(Statement.callMethod(print, Parameter.literal("CONDITION FALSE")));
         method.addStatements(Statement.createFlowControl(flow));
 
         method.addStatement(Statement.setVariable("varTest", Parameter.literal("a")));
@@ -60,6 +61,8 @@ public class BuilderDemo {
         classBuilder.addMethod(method);
 
         Class result = classBuilder.load();
+
+        System.out.println("TOTAL TIME: " + (System.currentTimeMillis() - time));
 
         try (FileOutputStream fos = new FileOutputStream("file.class")) {
             fos.write(classBuilder.getBytes());
