@@ -49,8 +49,8 @@ public class BuilderDemo {
 
         method.addStatement(Statement.setVariable("varTest", Parameter.literal("a")));
 
-        FlowControl whileTest = FlowControl.while_(BooleanExpression.not_null(Parameter.variable("varTest")), Statement.callMethod(print, Parameter.literal("HEY WHILE LOOP")));
-        method.addStatements(Statement.createFlowControl(whileTest));
+        //FlowControl whileTest = FlowControl.while_(BooleanExpression.not_null(Parameter.variable("varTest")), Statement.callMethod(print, Parameter.literal("HEY WHILE LOOP")));
+        //method.addStatements(Statement.createFlowControl(whileTest));
 
         method.addStatement(Statement.setVariable("varTest", Parameter.literal("ZZZ")));
 
@@ -62,6 +62,8 @@ public class BuilderDemo {
 
         // CallableMethod loop = MethodFinder.getStaticMethod(classBuilder.getInternalName(), "main", void.class.getName(), String.class.getName(), int.class.getName()).asCallable();
         // method.addStatement(Statement.callMethod(loop, Parameter.constant("IM A CONST"), Parameter.constant(2)));
+
+        method.addStatements(Statement.returnVoid());
 
         classBuilder.addMethod(method);
 

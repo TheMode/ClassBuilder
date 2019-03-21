@@ -56,9 +56,6 @@ public class MethodBuilder extends Reachable {
 
         setupStatements(classBuilder, methodVisitor);
 
-        // TODO return implementation
-        methodVisitor.visitInsn(RETURN);
-
         methodVisitor.visitMaxs(0, 0);
         methodVisitor.visitEnd();
     }

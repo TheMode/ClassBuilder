@@ -77,6 +77,19 @@ public class Statement implements Opcodes {
         });
     }
 
+    public static Statement returnParameter(Parameter parameter) {
+        return new Statement((classBuilder, method, visitor) -> {
+            parameter.push(classBuilder, method, visitor);
+            visitor.visitInsn(parameter.getReturnOpcode(classBuilder, method));
+        });
+    }
+
+    public static Statement returnVoid() {
+        return new Statement((classBuilder, method, visitor) -> {
+            visitor.visitInsn(RETURN);
+        });
+    }
+
     public static void setNextLabel(Label nextLabel) {
         Statement.nextLabel = nextLabel;
     }
@@ -92,6 +105,7 @@ public class Statement implements Opcodes {
 
         visitor.visitLabel(label);
         visitor.visitLineNumber(line, label);
+
         this.callback.append(classBuilder, method, visitor);
     }
 

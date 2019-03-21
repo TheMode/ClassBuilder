@@ -147,8 +147,21 @@ public class Parameter implements Opcodes {
         return null;
     }
 
+    protected int getReturnOpcode(ClassBuilder classBuilder, MethodBuilder method) {
+        switch (getTypeDescriptor(classBuilder, method)) {
+            case DescriptorUtils.INTEGER:
+                return IRETURN;
+            case DescriptorUtils.LONG:
+                return LRETURN;
+            case DescriptorUtils.FLOAT:
+                return FRETURN;
+            case DescriptorUtils.DOUBLE:
+                return DRETURN;
+        }
+        return ARETURN;
+    }
+
     protected int getStoreOpcode(ClassBuilder classBuilder, MethodBuilder method) {
-        // TODO array ?
         switch (getTypeDescriptor(classBuilder, method)) {
             case DescriptorUtils.INTEGER:
                 return ISTORE;
@@ -163,7 +176,6 @@ public class Parameter implements Opcodes {
     }
 
     private int getLoadOpcode(ClassBuilder classBuilder, MethodBuilder method) {
-        // TODO array ?
         switch (getTypeDescriptor(classBuilder, method)) {
             case DescriptorUtils.INTEGER:
                 return ILOAD;

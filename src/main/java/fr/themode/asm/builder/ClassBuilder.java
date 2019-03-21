@@ -137,6 +137,8 @@ public class ClassBuilder extends Reachable {
             method.addStatements(staticInit);
         }
 
+        method.addStatements(Statement.returnVoid());
+
         addMethod(method);
     }
 
