@@ -1,7 +1,7 @@
 # ClassBuilder
 
 # Overview
-Give you the ability to create java code... using java, the main goal is to generate code during run time, it can be used to create a scripting language.
+Give you the ability to create Java code... using Java, the main goal is to generate code during run time, it can be used to create a scripting language.
 ### TODO list ###
 - Flow control
 - Inheritance
